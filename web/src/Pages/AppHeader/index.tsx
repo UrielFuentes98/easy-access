@@ -1,5 +1,5 @@
 import { Box } from "@chakra-ui/layout";
-import { Button, Flex, Text } from "@chakra-ui/react";
+import { Flex, Text } from "@chakra-ui/react";
 
 function AppHeader() {
   return (
