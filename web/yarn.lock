@@ -1836,6 +1836,11 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
+"@fontsource/quicksand@^4.5.1":
+  version "4.5.1"
+  resolved "https://registry.yarnpkg.com/@fontsource/quicksand/-/quicksand-4.5.1.tgz#2de9e43289f0ca697a753537c05c6dc830988374"
+  integrity sha512-s40Umas42fr43/zHprNqEXtbPzVEAoX1iEJnXuH/Cz7b1/JXc0PFlzbFtyPMTNDmOwu6KARIgtRfKDvWpObFvA==
+
 "@hapi/address@2.x.x":
   version "2.1.4"
   resolved "https://registry.yarnpkg.com/@hapi/address/-/address-2.1.4.tgz#5d67ed43f3fd41a69d4b9ff7b56e7c0d1d0a81e5"

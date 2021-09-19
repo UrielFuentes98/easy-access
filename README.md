@@ -1,1 +1,1 @@
-# pomo-tracker-v2
+# easy access project repo.
