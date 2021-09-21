@@ -1,6 +1,6 @@
 import { Box, Container } from "@chakra-ui/react";
 import { Router, Route, Switch } from "react-router-dom";
-import { routes, defaultPage, history } from "app";
+import { routes, defaultPage, history } from "./app/";
 import { AppHeader } from "./Pages";
 
 const app_routes = [...routes];

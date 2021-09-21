@@ -8,19 +8,20 @@ import {
 } from "@chakra-ui/react";
 import { Field, FieldProps, Form, Formik } from "formik";
 
-interface PhraseFormVals {
-  phrase: string;
+interface SignInFormVals {
+  email: string;
 }
 
-const initialValues: PhraseFormVals = {
-  phrase: "",
+const initialValues: SignInFormVals = {
+  email: "",
 };
 
-function PhraseInput() {
-  function validatePhrase(value: string) {
+function SignIn() {
+  function validateEmail(value: string) {
     let error;
-    if (!value) {
-      error = "You should enter the transfer´s phrase";
+    var re = /\S+@\S+\.\S+/;
+    if (!re.test(value)) {
+      error = "You should enter a valid email";
     }
     return error;
   }
@@ -46,23 +47,23 @@ function PhraseInput() {
           <Form>
             <VStack flexFlow="column" alignItems="center" spacing={3}>
               <Text fontSize={["xl", null, "3xl"]} fontWeight="bold" pb={2}>
-                Access Files
+                Sign In
               </Text>
               <Text fontSize={["md", null, "xl"]} textAlign="center">
-                Enter the phrase to access your files.
+                Or Sign In to create a new transfer.
               </Text>
-              <Field name="phrase" validate={validatePhrase}>
+              <Field name="email" validate={validateEmail}>
                 {({ field, form }: FieldProps) => (
                   <FormControl
-                    isInvalid={form.touched.phrase && !!form.errors.phrase}
+                    isInvalid={form.touched.email && !!form.errors.email}
                   >
                     <Input
                       {...field}
                       fontSize={["md", null, "xl"]}
-                      id="phrase"
-                      placeholder="Phrase"
+                      id="email"
+                      placeholder="Enter your email"
                     />
-                    <FormErrorMessage>{form.errors.phrase}</FormErrorMessage>
+                    <FormErrorMessage>{form.errors.email}</FormErrorMessage>
                   </FormControl>
                 )}
               </Field>
@@ -78,4 +79,4 @@ function PhraseInput() {
   );
 }
 
-export default PhraseInput;
+export default SignIn;

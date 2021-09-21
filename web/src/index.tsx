@@ -6,7 +6,7 @@ import { Provider } from "react-redux";
 import * as serviceWorker from "./serviceWorker";
 import "@fontsource/quicksand"
 import { ChakraProvider } from "@chakra-ui/react";
-import {theme} from './app'
+import {theme} from './app/'
 import './index.css'
 
 ReactDOM.render(
