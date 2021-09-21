@@ -1,4 +1,5 @@
 import { Box, VStack } from "@chakra-ui/layout";
+import { useHistory } from "react-router-dom";
 import {
   Button,
   FormControl,
@@ -7,6 +8,8 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { Field, FieldProps, Form, Formik } from "formik";
+import { useEffect } from "react";
+import { Magic } from "magic-sdk";
 
 interface SignInFormVals {
   email: string;
@@ -16,15 +19,29 @@ const initialValues: SignInFormVals = {
   email: "",
 };
 
-function SignIn() {
-  function validateEmail(value: string) {
-    let error;
-    var re = /\S+@\S+\.\S+/;
-    if (!re.test(value)) {
-      error = "You should enter a valid email";
-    }
-    return error;
+function validateEmail(value: string) {
+  let error;
+  var re = /\S+@\S+\.\S+/;
+  if (!re.test(value)) {
+    error = "You should enter a valid email";
   }
+  return error;
+}
+
+const magic = new Magic("pk_live_9CECDC3B1BA34ADB");
+
+function SignIn() {
+  const history = useHistory();
+
+  useEffect(() => {
+    async function checkLoginStatus() {
+      const isLoggedIn = await magic.user.isLoggedIn();
+      if (isLoggedIn) {
+        history.push("/home");
+      }
+    }
+    checkLoginStatus();
+  }, []);
 
   return (
     <Box
@@ -36,11 +53,10 @@ function SignIn() {
     >
       <Formik
         initialValues={initialValues}
-        onSubmit={(values, actions) => {
-          setTimeout(() => {
-            alert(JSON.stringify(values, null, 2));
-            actions.setSubmitting(false);
-          }, 1000);
+        onSubmit={async (values: SignInFormVals, actions) => {
+          const email = values.email;
+          await magic.auth.loginWithMagicLink({ email });
+          actions.setSubmitting(false);
         }}
       >
         {({ isSubmitting }) => (

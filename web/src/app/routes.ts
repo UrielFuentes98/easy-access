@@ -1,16 +1,20 @@
-import { LandingPage } from 'Pages'
-import { FC } from 'react'
+import { LandingPage, HomePage } from "Pages";
+import { FC } from "react";
 
 interface PagePath {
-  path: string
-  page: FC
+  path: string;
+  page: FC;
 }
 
 export const routes: PagePath[] = [
   {
-    path: '/',
+    path: "/",
     page: LandingPage,
   },
-]
+  {
+    path: "/home",
+    page: HomePage,
+  },
+];
 
-export const defaultPage: FC = LandingPage
+export const defaultPage: FC = LandingPage;
