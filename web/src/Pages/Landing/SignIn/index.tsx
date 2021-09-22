@@ -40,7 +40,7 @@ function SignIn() {
         history.push("/home");
       }
     }
-    checkLoginStatus();
+    //checkLoginStatus();
   }, []);
 
   return (
@@ -66,7 +66,7 @@ function SignIn() {
                 Sign In
               </Text>
               <Text fontSize={["md", null, "xl"]} textAlign="center">
-                Or Sign In to create a new transfer.
+                Or SignIn/SignUp to create a new transfer.
               </Text>
               <Field name="email" validate={validateEmail}>
                 {({ field, form }: FieldProps) => (

@@ -1,4 +1,4 @@
-import { Box, Container } from "@chakra-ui/react";
+import { Box, Container, VStack } from "@chakra-ui/react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { routes, defaultPage } from "./app/";
 import { AppHeader } from "./Pages";
@@ -12,14 +12,14 @@ function App() {
   return (
     <Container maxW="container.xl" centerContent px={10}>
       <AppHeader />
-      <Box position="absolute" top={100}>
+      <VStack position="absolute" top={100} spacing={8}>
         <BrowserRouter>
           <Switch>
             {route_pages}
             <Route component={defaultPage}></Route>
           </Switch>
         </BrowserRouter>
-      </Box>
+      </VStack>
     </Container>
   );
 }

@@ -3,7 +3,7 @@ import { Flex, Text } from "@chakra-ui/react";
 
 function AppHeader() {
   return (
-    <Box w="full" maxW="4xl" h="3xs" borderBottomRadius={50} bg="orange.400">
+    <Box w="full" maxW="4xl" h="2xs" borderBottomRadius={50} bg="orange.400">
       <Flex alignContent="center">
         <Box flex="1" />
         <Text
