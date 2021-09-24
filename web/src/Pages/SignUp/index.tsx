@@ -5,24 +5,41 @@ import {
   FormControl,
   FormErrorMessage,
   Input,
+  Select,
   Text,
 } from "@chakra-ui/react";
 import { Field, FieldProps, Form, Formik } from "formik";
+import { InputField } from "features";
 import { useEffect } from "react";
 
 interface SignUpFormVals {
-  email: string;
+  answer_public: string;
+  answer_private: string;
+  question_public: string;
+  question_private: string;
 }
 
 const initialValues: SignUpFormVals = {
-  email: "",
+  answer_public: "",
+  answer_private: "",
+  question_private: "0",
+  question_public: "0",
 };
 
-function validateEmail(value: string) {
+const questions: string[] = ["question1?", "question2?", "question3?"];
+
+function validatePrivAnswer(value: string) {
   let error;
-  var re = /\S+@\S+\.\S+/;
-  if (!re.test(value)) {
-    error = "You should enter a valid email";
+  if (!value) {
+    error = "You should enter an answer";
+  }
+  return error;
+}
+
+function validatePrivQuestion(value: string) {
+  let error;
+  if (!value) {
+    error = "You should select a question";
   }
   return error;
 }
@@ -42,32 +59,48 @@ function SignUp() {
         w={["2xs", null, "sm"]}
         py={6}
         px={[4, null, 8]}
-        rounded={40}
+        rounded={[30, null, 40]}
         bg="white"
       >
         <Formik
           initialValues={initialValues}
-          onSubmit={async (values: SignUpFormVals, actions) => {}}
+          onSubmit={async (values: SignUpFormVals, actions) => {
+            alert(JSON.stringify(values, null, 2));
+          }}
         >
           {({ isSubmitting }) => (
             <Form>
               <VStack flexFlow="column" alignItems="center" spacing={3}>
-                <Field name="email" validate={validateEmail}>
-                  {({ field, form }: FieldProps) => (
-                    <FormControl
-                      isInvalid={form.touched.email && !!form.errors.email}
-                    >
-                      <Input
-                        {...field}
-                        fontSize={["md", null, "xl"]}
-                        id="email"
-                        placeholder="Enter your email"
-                      />
-                      <FormErrorMessage>{form.errors.email}</FormErrorMessage>
-                    </FormControl>
-                  )}
-                </Field>
-
+                <InputField
+                  name="question_private"
+                  label="Private question"
+                  placeholder="Select a question"
+                  fontSize={["md", null, "xl"]}
+                  isSelect={true}
+                  selectOptions={questions}
+                  validate={validatePrivQuestion}
+                />
+                <InputField
+                  name="answer_private"
+                  placeholder="Your answer"
+                  label="Private answer"
+                  fontSize={["md", null, "xl"]}
+                  validate={validatePrivAnswer}
+                />
+                <InputField
+                  name="question_public"
+                  label="Public question"
+                  placeholder="Select a question"
+                  fontSize={["md", null, "xl"]}
+                  isSelect={true}
+                  selectOptions={questions}
+                />
+                <InputField
+                  name="answer_public"
+                  placeholder="Your answer"
+                  label="Public answer"
+                  fontSize={["md", null, "xl"]}
+                />
                 <Button type="submit" isLoading={isSubmitting}>
                   Submit
                 </Button>

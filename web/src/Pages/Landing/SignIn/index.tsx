@@ -10,6 +10,7 @@ import {
 import { Field, FieldProps, Form, Formik } from "formik";
 import { useEffect } from "react";
 import { Magic } from "magic-sdk";
+import { InputField } from "features";
 
 interface SignInFormVals {
   email: string;
@@ -68,22 +69,12 @@ function SignIn() {
               <Text fontSize={["md", null, "xl"]} textAlign="center">
                 Or SignIn/SignUp to create a new transfer.
               </Text>
-              <Field name="email" validate={validateEmail}>
-                {({ field, form }: FieldProps) => (
-                  <FormControl
-                    isInvalid={form.touched.email && !!form.errors.email}
-                  >
-                    <Input
-                      {...field}
-                      fontSize={["md", null, "xl"]}
-                      id="email"
-                      placeholder="Enter your email"
-                    />
-                    <FormErrorMessage>{form.errors.email}</FormErrorMessage>
-                  </FormControl>
-                )}
-              </Field>
-
+              <InputField
+                name="email"
+                placeholder="Enter your email"
+                fontSize={["md", null, "xl"]}
+                validate={validateEmail}
+              />
               <Button type="submit" isLoading={isSubmitting}>
                 Submit
               </Button>
