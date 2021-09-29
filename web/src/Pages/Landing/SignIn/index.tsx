@@ -41,7 +41,7 @@ function SignIn() {
         history.push("/home");
       }
     }
-    //checkLoginStatus();
+    checkLoginStatus();
   }, []);
 
   return (
@@ -56,7 +56,20 @@ function SignIn() {
         initialValues={initialValues}
         onSubmit={async (values: SignInFormVals, actions) => {
           const email = values.email;
-          await magic.auth.loginWithMagicLink({ email });
+          const didToken = await magic.auth.loginWithMagicLink({ email });
+          const response = await fetch("/user/login", {
+            headers: new Headers({
+              Authorization: "Bearer " + didToken,
+            }),
+            credentials: "same-origin",
+            method: "POST",
+          });
+          const message = await response.text();
+          if (message === "User was logged in.") {
+            history.push("/home");
+          } else {
+            history.push("/signup");
+          }
           actions.setSubmitting(false);
         }}
       >
