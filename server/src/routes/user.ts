@@ -1,4 +1,5 @@
 import express from "express";
+import { saveUserInfo } from "../controllers/user";
 import { passport, magic } from "../utils";
 const router = express.Router();
 
@@ -15,9 +16,8 @@ router.post("/login", passport.authenticate("magic"), (req, res) => {
   }
 });
 
-/* 5️⃣ Implement User Endpoints */
+/* Implement User Endpoints */
 
-/* Implement Get Data Endpoint */
 router.get("/", async (req, res) => {
   if (req.isAuthenticated()) {
     return res.status(200).json(req.user).end();
@@ -26,7 +26,19 @@ router.get("/", async (req, res) => {
   }
 });
 
-/* Implement Logout Endpoint */
+router.post("/register", async (req, res) => {
+  if (req.isAuthenticated()) {
+    const result = await saveUserInfo(req.body, req.user);
+    if (result) {
+      return res.status(200).end("User Info saved.");
+    } else {
+      return res.status(401).end("User Info not saved.");
+    }
+  } else {
+    return res.status(401).end("User is not logged in.");
+  }
+});
+
 router.post("/logout", async (req, res) => {
   if (req.isAuthenticated()) {
     await magic.users.logoutByIssuer(req.user.issuer);
