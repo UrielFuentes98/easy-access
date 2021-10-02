@@ -1,6 +1,7 @@
 import { Box, VStack } from "@chakra-ui/layout";
 import { useHistory } from "react-router-dom";
 import {
+  Alert,
   Button,
   FormControl,
   FormErrorMessage,
@@ -10,9 +11,11 @@ import {
 } from "@chakra-ui/react";
 import { Field, FieldProps, Form, Formik } from "formik";
 import { InputField } from "features";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { completeUserInfo as POST_UserInfo } from "app/utils/api/user";
+import { act } from "@testing-library/react";
 
-interface SignUpFormVals {
+export interface SignUpFormVals {
   answer_public: string;
   answer_private: string;
   question_public: string;
@@ -22,8 +25,8 @@ interface SignUpFormVals {
 const initialValues: SignUpFormVals = {
   answer_public: "",
   answer_private: "",
-  question_private: "0",
-  question_public: "0",
+  question_private: "",
+  question_public: "",
 };
 
 const questions: string[] = ["question1?", "question2?", "question3?"];
@@ -45,6 +48,8 @@ function validatePrivQuestion(value: string) {
 }
 
 function SignUp() {
+  const history = useHistory();
+  const [submitErr, setSubmitErr] = useState(false);
   return (
     <>
       <Text
@@ -65,7 +70,13 @@ function SignUp() {
         <Formik
           initialValues={initialValues}
           onSubmit={async (values: SignUpFormVals, actions) => {
-            alert(JSON.stringify(values, null, 2));
+            let result = await POST_UserInfo(values);
+            if (result) {
+              history.push("/home");
+            } else {
+              setSubmitErr(true);
+            }
+            actions.setSubmitting(false);
           }}
         >
           {({ isSubmitting }) => (
@@ -101,6 +112,12 @@ function SignUp() {
                   label="Public answer"
                   fontSize={["md", null, "xl"]}
                 />
+                {submitErr && (
+                  <Alert status="error" textAlign="center">
+                    There was an error processing your request. Please try
+                    again.
+                  </Alert>
+                )}
                 <Button type="submit" isLoading={isSubmitting}>
                   Submit
                 </Button>

@@ -68,7 +68,6 @@ const login = async (
     });
   }
   wrap(existingUser).assign({
-    issuer: magicUser.issuer,
     lastLoginAt: magicUser.claim.iat,
   });
   await DI.userRepository.persistAndFlush(existingUser);

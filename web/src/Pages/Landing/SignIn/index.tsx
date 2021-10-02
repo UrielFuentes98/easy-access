@@ -1,16 +1,11 @@
 import { Box, VStack } from "@chakra-ui/layout";
 import { useHistory } from "react-router-dom";
-import {
-  Button,
-  FormControl,
-  FormErrorMessage,
-  Input,
-  Text,
-} from "@chakra-ui/react";
-import { Field, FieldProps, Form, Formik } from "formik";
+import { Button, Text } from "@chakra-ui/react";
+import { Form, Formik } from "formik";
 import { useEffect } from "react";
 import { Magic } from "magic-sdk";
 import { InputField } from "features";
+import { loginUser } from "app/utils/api/user";
 
 interface SignInFormVals {
   email: string;
@@ -34,15 +29,15 @@ const magic = new Magic("pk_live_9CECDC3B1BA34ADB");
 function SignIn() {
   const history = useHistory();
 
-  useEffect(() => {
-    async function checkLoginStatus() {
-      const isLoggedIn = await magic.user.isLoggedIn();
-      if (isLoggedIn) {
-        history.push("/home");
-      }
-    }
-    checkLoginStatus();
-  }, []);
+  // useEffect(() => {
+  //   async function checkLoginStatus() {
+  //     const isLoggedIn = await magic.user.isLoggedIn();
+  //     if (isLoggedIn) {
+  //       history.push("/home");
+  //     }
+  //   }
+  //   checkLoginStatus();
+  // }, []);
 
   return (
     <Box
@@ -57,14 +52,7 @@ function SignIn() {
         onSubmit={async (values: SignInFormVals, actions) => {
           const email = values.email;
           const didToken = await magic.auth.loginWithMagicLink({ email });
-          const response = await fetch("/user/login", {
-            headers: new Headers({
-              Authorization: "Bearer " + didToken,
-            }),
-            credentials: "same-origin",
-            method: "POST",
-          });
-          const message = await response.text();
+          const message = await loginUser(didToken);
           if (message === "User was logged in.") {
             history.push("/home");
           } else {

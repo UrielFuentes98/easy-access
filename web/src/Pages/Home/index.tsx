@@ -10,7 +10,7 @@ function HomePage() {
   useEffect(() => {
     async function fetchUserData() {
       const userMetadata = await magic.user.getMetadata();
-      alert(JSON.stringify(userMetadata, null, 2));
+      //alert(JSON.stringify(userMetadata, null, 2));
     }
     fetchUserData();
   }, []);
