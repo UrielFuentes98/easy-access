@@ -1,16 +1,25 @@
-import React from "react";
-import logo from "./logo.svg";
-import { Counter } from "./features/counter/Counter";
-import { Box, Container, Flex } from "@chakra-ui/react";
-import { AppHeader, LandingPage } from "./Pages";
+import { Box, Container, VStack } from "@chakra-ui/react";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { routes, defaultPage } from "./app/";
+import { AppHeader } from "./Pages";
 
+const app_routes = [...routes];
 function App() {
+  const route_pages = app_routes.map(({ path, page }, key) => (
+    <Route exact path={path} component={page} key={key} />
+  ));
+
   return (
     <Container maxW="container.xl" centerContent px={10}>
       <AppHeader />
-      <Box position="absolute" top={100}>
-      <LandingPage />
-      </Box>
+      <VStack position="absolute" top={100} spacing={8}>
+        <BrowserRouter>
+          <Switch>
+            {route_pages}
+            <Route component={defaultPage}></Route>
+          </Switch>
+        </BrowserRouter>
+      </VStack>
     </Container>
   );
 }
