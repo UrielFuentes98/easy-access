@@ -1,4 +1,4 @@
-import { LandingPage, HomePage, SignUp } from "Pages";
+import { LandingPage, HomePage, SignUp, NewTransfer } from "Pages";
 import { FC } from "react";
 
 interface PagePath {
@@ -18,6 +18,10 @@ export const routes: PagePath[] = [
   {
     path: "/signup",
     page: SignUp,
+  },
+  {
+    path: "/newtransfer",
+    page: NewTransfer,
   },
 ];
 

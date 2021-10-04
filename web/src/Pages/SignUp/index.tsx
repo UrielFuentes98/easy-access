@@ -1,19 +1,10 @@
 import { Box, VStack } from "@chakra-ui/layout";
 import { useHistory } from "react-router-dom";
-import {
-  Alert,
-  Button,
-  FormControl,
-  FormErrorMessage,
-  Input,
-  Select,
-  Text,
-} from "@chakra-ui/react";
-import { Field, FieldProps, Form, Formik } from "formik";
+import { Alert, Button, Text } from "@chakra-ui/react";
+import { Form, Formik } from "formik";
 import { InputField } from "features";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { completeUserInfo as POST_UserInfo } from "app/utils/api/user";
-import { act } from "@testing-library/react";
 
 export interface SignUpFormVals {
   answer_public: string;
