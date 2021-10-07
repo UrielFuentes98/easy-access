@@ -1,20 +1,29 @@
 import { Box, VStack } from "@chakra-ui/layout";
 import { useHistory } from "react-router-dom";
-import { Alert, Button, Text } from "@chakra-ui/react";
-import { Form, Formik } from "formik";
-import { InputField } from "features";
+import {
+  Alert,
+  Button,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Radio,
+  RadioGroup,
+  Text,
+} from "@chakra-ui/react";
+import { Field, FieldProps, Form, Formik } from "formik";
+import { durationOption, InputField } from "features";
 import { useState } from "react";
 import { completeUserInfo as POST_UserInfo } from "app/utils/api/user";
 
 export interface NewTransFormVals {
   phrase: string;
-  duration: number;
+  duration: string;
   is_public: boolean;
 }
 
 const initialValues: NewTransFormVals = {
   phrase: "",
-  duration: 15,
+  duration: "15",
   is_public: false,
 };
 
@@ -25,6 +34,12 @@ function validatePhrase(value: string) {
   }
   return error;
 }
+
+const durationOptions: durationOption[] = [
+  { value: "15", placeholder: "15 minutes" },
+  { value: "180", placeholder: "3 hours" },
+  { value: "1140", placeholder: "1 day" },
+];
 
 function NewTransfer() {
   const history = useHistory();
@@ -58,6 +73,13 @@ function NewTransfer() {
                   placeholder="Transfer phrase"
                   fontSize={["md", null, "xl"]}
                   validate={validatePhrase}
+                />
+                <InputField
+                  name="duration"
+                  fontSize={["md", null, "xl"]}
+                  inputType="radio"
+                  label="Select the duration of the transfer."
+                  durationOptions={durationOptions}
                 />
                 {submitErr && (
                   <Alert status="error" textAlign="center">

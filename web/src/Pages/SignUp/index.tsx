@@ -78,7 +78,7 @@ function SignUp() {
                   label="Private question"
                   placeholder="Select a question"
                   fontSize={["md", null, "xl"]}
-                  isSelect={true}
+                  inputType="select"
                   selectOptions={questions}
                   validate={validatePrivQuestion}
                 />
@@ -94,7 +94,7 @@ function SignUp() {
                   label="Public question"
                   placeholder="Select a question"
                   fontSize={["md", null, "xl"]}
-                  isSelect={true}
+                  inputType="select"
                   selectOptions={questions}
                 />
                 <InputField
