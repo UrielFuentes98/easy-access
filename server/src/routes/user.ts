@@ -1,5 +1,9 @@
 import express from "express";
-import { MSG_USER_LOGGED_IN, MSG_USER_SIGNED_UP } from "../app_constants";
+import {
+  MSG_USER_LOGGED_IN,
+  MSG_USER_NOT_LOGGED_IN,
+  MSG_USER_SIGNED_UP,
+} from "../constants";
 import { saveUserInfo } from "../controllers/user";
 import { passport, magic } from "../utils";
 const router = express.Router();
@@ -23,7 +27,7 @@ router.get("/", async (req, res) => {
   if (req.isAuthenticated()) {
     return res.status(200).json(req.user).end();
   } else {
-    return res.status(401).end(`User is not logged in.`);
+    return res.status(401).end(MSG_USER_NOT_LOGGED_IN);
   }
 });
 
@@ -36,7 +40,7 @@ router.post("/register", async (req, res) => {
       return res.status(401).end("User Info not saved.");
     }
   } else {
-    return res.status(401).end("User is not logged in.");
+    return res.status(401).end(MSG_USER_NOT_LOGGED_IN);
   }
 });
 
@@ -46,7 +50,7 @@ router.post("/logout", async (req, res) => {
     req.logout();
     return res.status(200).end();
   } else {
-    return res.status(401).end(`User is not logged in.`);
+    return res.status(401).end(MSG_USER_NOT_LOGGED_IN);
   }
 });
 

@@ -12,24 +12,29 @@ export async function saveUserInfo(
   userInfo: UserInfo,
   user: Express.User
 ): Promise<boolean> {
-  const registeredUser = await DI.userRepository.findOne({
-    issuer: user.issuer,
-  });
-
-  if (registeredUser) {
-    wrap(registeredUser).assign({
-      question_private: parseInt(userInfo.question_private),
-      answer_private: userInfo.answer_private,
+  try {
+    const registeredUser = await DI.userRepository.findOne({
+      issuer: user.issuer,
     });
 
-    if (userInfo.question_public) {
+    if (registeredUser) {
       wrap(registeredUser).assign({
-        question_public: parseInt(userInfo.question_public),
-        answer_public: userInfo.answer_public,
+        question_private: parseInt(userInfo.question_private),
+        answer_private: userInfo.answer_private,
       });
-    }
-    await DI.userRepository.persistAndFlush(registeredUser);
-  }
 
-  return true;
+      if (userInfo.question_public) {
+        wrap(registeredUser).assign({
+          question_public: parseInt(userInfo.question_public),
+          answer_public: userInfo.answer_public,
+        });
+      }
+      await DI.userRepository.persistAndFlush(registeredUser);
+      return true;
+    }
+    return false;
+  } catch (err) {
+    console.error(err);
+    return false;
+  }
 }

@@ -10,13 +10,13 @@ export class Transfer {
   phrase!: string;
 
   @Property()
-  duration_secs!: number;
+  duration!: number;
 
   @ManyToOne(() => User)
   owner!: User;
 
   @Property()
-  is_private!: boolean;
+  is_public!: boolean;
 
   @Property({ type: "date" })
   createdAt = new Date();

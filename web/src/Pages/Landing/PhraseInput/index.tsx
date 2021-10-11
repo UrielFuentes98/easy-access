@@ -54,7 +54,7 @@ function PhraseInput() {
               </Text>
               <InputField
                 name="phrase"
-                placeholder="Enter your email"
+                placeholder="Enter phrase"
                 fontSize={["md", null, "xl"]}
                 validate={validatePhrase}
               />

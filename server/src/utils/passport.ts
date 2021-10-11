@@ -2,7 +2,7 @@ import { DI } from "../index";
 
 /* 1️⃣ Setup Magic Admin SDK */
 import { Magic, MagicUserMetadata } from "@magic-sdk/admin";
-import { MAGIC_SECRET_KEY } from "../app_constants";
+import { MAGIC_SECRET_KEY } from "../constants";
 export const magic = new Magic(MAGIC_SECRET_KEY);
 
 /* 2️⃣ Implement Auth Strategy */

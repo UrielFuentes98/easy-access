@@ -1,4 +1,4 @@
-import { __prod__ } from "./app_constants";
+import { __prod__ } from "./constants";
 import { MikroORM } from "@mikro-orm/core";
 import path from "path";
 import { User, Question, Transfer } from "./entities";

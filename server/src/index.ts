@@ -11,9 +11,9 @@ import logger from "morgan";
 import session from "express-session";
 import passport from "passport";
 
-import { __prod__ } from "./app_constants";
+import { __prod__ } from "./constants";
 import microConfig from "./mikro-orm.config";
-import { Question, User } from "./entities";
+import { Question, Transfer, User } from "./entities";
 import { transferRouter, userRouter } from "./routes";
 
 export const DI = {} as {
@@ -21,6 +21,7 @@ export const DI = {} as {
   em: EntityManager;
   userRepository: EntityRepository<User>;
   questionRepository: EntityRepository<Question>;
+  transferRepository: EntityRepository<Transfer>;
 };
 
 const main = async () => {
@@ -28,6 +29,7 @@ const main = async () => {
   DI.em = DI.orm.em;
   DI.userRepository = DI.orm.em.getRepository(User);
   DI.questionRepository = DI.orm.em.getRepository(Question);
+  DI.transferRepository = DI.orm.em.getRepository(Transfer);
 
   const app = express();
 
