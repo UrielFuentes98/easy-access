@@ -1,5 +1,13 @@
-import { Entity, ManyToOne, PrimaryKey, Property } from "@mikro-orm/core";
+import {
+  Collection,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryKey,
+  Property,
+} from "@mikro-orm/core";
 import { Question } from "./Question";
+import { Transfer } from "./Transfer";
 
 @Entity()
 export class User {
@@ -26,6 +34,9 @@ export class User {
 
   @Property({ nullable: true })
   answer_public?: string;
+
+  @OneToMany(() => Transfer, (transfer) => transfer.owner)
+  user_transfers = new Collection<Transfer>(this);
 
   @Property({ type: "date" })
   createdAt = new Date();

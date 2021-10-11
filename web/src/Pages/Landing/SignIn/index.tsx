@@ -1,11 +1,16 @@
 import { Box, VStack } from "@chakra-ui/layout";
 import { useHistory } from "react-router-dom";
-import { Button, Text } from "@chakra-ui/react";
+import { Alert, Button, Text } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Magic } from "magic-sdk";
 import { InputField } from "features";
 import { loginUser } from "app/utils/api/user";
+import {
+  MSG_REQ_ERR,
+  RES_USER_LOGGED_IN,
+  RES_USER_SIGNED_UP,
+} from "app_constants";
 
 interface SignInFormVals {
   email: string;
@@ -28,16 +33,23 @@ const magic = new Magic("pk_live_9CECDC3B1BA34ADB");
 
 function SignIn() {
   const history = useHistory();
+  const [submitErr, setSubmitErr] = useState(false);
 
-  // useEffect(() => {
-  //   async function checkLoginStatus() {
-  //     const isLoggedIn = await magic.user.isLoggedIn();
-  //     if (isLoggedIn) {
-  //       history.push("/home");
-  //     }
-  //   }
-  //   checkLoginStatus();
-  // }, []);
+  useEffect(() => {
+    async function checkLoginStatus() {
+      const isLoggedIn = await magic.user.isLoggedIn();
+      if (isLoggedIn) {
+        const didToken = await magic.user.getIdToken();
+        const message = await loginUser(didToken);
+        if (message === RES_USER_LOGGED_IN) {
+          history.push("/home");
+        } else if (message === RES_USER_SIGNED_UP) {
+          history.push("/signup");
+        }
+      }
+    }
+    checkLoginStatus();
+  }, []);
 
   return (
     <Box
@@ -53,10 +65,12 @@ function SignIn() {
           const email = values.email;
           const didToken = await magic.auth.loginWithMagicLink({ email });
           const message = await loginUser(didToken);
-          if (message === "User was logged in.") {
+          if (message === RES_USER_LOGGED_IN) {
             history.push("/home");
-          } else {
+          } else if (message === RES_USER_SIGNED_UP) {
             history.push("/signup");
+          } else {
+            setSubmitErr(true);
           }
           actions.setSubmitting(false);
         }}
@@ -76,6 +90,11 @@ function SignIn() {
                 fontSize={["md", null, "xl"]}
                 validate={validateEmail}
               />
+              {submitErr && (
+                <Alert status="error" textAlign="center">
+                  {MSG_REQ_ERR}
+                </Alert>
+              )}
               <Button type="submit" isLoading={isSubmitting}>
                 Submit
               </Button>

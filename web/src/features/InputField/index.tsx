@@ -9,6 +9,7 @@ import {
   RadioGroup,
   Radio,
   VStack,
+  Checkbox,
 } from "@chakra-ui/react";
 
 export interface durationOption {
@@ -21,7 +22,8 @@ type InputFieldProps = InputHTMLAttributes<HTMLInputElement> & {
   name: string;
   fontSize: (string | null)[];
   validate?: (value: string) => string | undefined;
-  inputType?: "select" | "radio";
+  inputType?: "select" | "radio" | "check-box";
+  labelPos?: "left" | "center";
   selectOptions?: string[];
   durationOptions?: durationOption[];
 };
@@ -30,19 +32,20 @@ export const InputField: React.FC<InputFieldProps> = ({
   label,
   size: _,
   fontSize,
+  labelPos,
   inputType,
   selectOptions,
   durationOptions,
   ...props
 }) => {
-  const [field, { error }] = useField(props);
+  const [field, { error, touched }] = useField(props);
   return (
-    <FormControl isInvalid={!!error}>
-      {label && (
+    <FormControl isInvalid={!!error && touched}>
+      {label && inputType !== "check-box" && (
         <FormLabel
           htmlFor={field.name}
           fontSize={fontSize}
-          textAlign={inputType !== "radio" ? "left" : "center"}
+          textAlign={labelPos}
         >
           {label}
         </FormLabel>
@@ -68,6 +71,16 @@ export const InputField: React.FC<InputFieldProps> = ({
             ))}
           </VStack>
         </RadioGroup>
+      ) : inputType === "check-box" ? (
+        <Checkbox
+          id={field.name}
+          isChecked={field.value}
+          onChange={field.onChange}
+        >
+          <FormLabel htmlFor={field.name} fontSize={fontSize} mb={0}>
+            {label}
+          </FormLabel>
+        </Checkbox>
       ) : (
         <Input {...field} {...props} id={field.name} fontSize={fontSize} />
       )}

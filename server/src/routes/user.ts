@@ -1,4 +1,5 @@
 import express from "express";
+import { MSG_USER_LOGGED_IN, MSG_USER_SIGNED_UP } from "../app_constants";
 import { saveUserInfo } from "../controllers/user";
 import { passport, magic } from "../utils";
 const router = express.Router();
@@ -7,9 +8,9 @@ const router = express.Router();
 router.post("/login", passport.authenticate("magic"), (req, res) => {
   if (req.user) {
     if (req.wasLogin) {
-      res.status(200).end("User was logged in.");
+      res.status(200).end(MSG_USER_LOGGED_IN);
     } else {
-      res.status(200).end("User was signed up.");
+      res.status(200).end(MSG_USER_SIGNED_UP);
     }
   } else {
     return res.status(401).end("Could not log user in.");

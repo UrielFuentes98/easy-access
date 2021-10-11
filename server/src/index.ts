@@ -11,10 +11,10 @@ import logger from "morgan";
 import session from "express-session";
 import passport from "passport";
 
-import { __prod__ } from "./constants";
+import { __prod__ } from "./app_constants";
 import microConfig from "./mikro-orm.config";
 import { Question, User } from "./entities";
-import { userRouter } from "./routes";
+import { transferRouter, userRouter } from "./routes";
 
 export const DI = {} as {
   orm: MikroORM;
@@ -50,7 +50,7 @@ const main = async () => {
   app.use(passport.initialize());
   app.use(passport.session());
   app.use("/user", userRouter);
-
+  app.use("/transfer", transferRouter);
   app.listen(4000, () => {
     console.log("server started on localhost:4000");
   });

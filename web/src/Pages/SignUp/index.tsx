@@ -5,6 +5,7 @@ import { Form, Formik } from "formik";
 import { InputField } from "features";
 import { useState } from "react";
 import { completeUserInfo as POST_UserInfo } from "app/utils/api/user";
+import { MSG_REQ_ERR } from "app_constants";
 
 export interface SignUpFormVals {
   answer_public: string;
@@ -105,8 +106,7 @@ function SignUp() {
                 />
                 {submitErr && (
                   <Alert status="error" textAlign="center">
-                    There was an error processing your request. Please try
-                    again.
+                    {MSG_REQ_ERR}
                   </Alert>
                 )}
                 <Button type="submit" isLoading={isSubmitting}>

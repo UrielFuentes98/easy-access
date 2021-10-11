@@ -6,6 +6,7 @@ import {
   Input,
   Text,
 } from "@chakra-ui/react";
+import { InputField } from "features";
 import { Field, FieldProps, Form, Formik } from "formik";
 
 interface PhraseFormVals {
@@ -51,21 +52,12 @@ function PhraseInput() {
               <Text fontSize={["md", null, "xl"]} textAlign="center">
                 Enter the phrase to access your files.
               </Text>
-              <Field name="phrase" validate={validatePhrase}>
-                {({ field, form }: FieldProps) => (
-                  <FormControl
-                    isInvalid={form.touched.phrase && !!form.errors.phrase}
-                  >
-                    <Input
-                      {...field}
-                      fontSize={["md", null, "xl"]}
-                      id="phrase"
-                      placeholder="Phrase"
-                    />
-                    <FormErrorMessage>{form.errors.phrase}</FormErrorMessage>
-                  </FormControl>
-                )}
-              </Field>
+              <InputField
+                name="phrase"
+                placeholder="Enter your email"
+                fontSize={["md", null, "xl"]}
+                validate={validatePhrase}
+              />
 
               <Button type="submit" isLoading={isSubmitting}>
                 Submit

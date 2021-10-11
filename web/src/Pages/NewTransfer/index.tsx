@@ -1,19 +1,9 @@
 import { Box, VStack } from "@chakra-ui/layout";
-import { useHistory } from "react-router-dom";
-import {
-  Alert,
-  Button,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Radio,
-  RadioGroup,
-  Text,
-} from "@chakra-ui/react";
-import { Field, FieldProps, Form, Formik } from "formik";
+import { Alert, Button, Text } from "@chakra-ui/react";
+import { Form, Formik } from "formik";
 import { durationOption, InputField } from "features";
 import { useState } from "react";
-import { completeUserInfo as POST_UserInfo } from "app/utils/api/user";
+import { POST_NewTransfer } from "app/utils/api";
 
 export interface NewTransFormVals {
   phrase: string;
@@ -42,7 +32,6 @@ const durationOptions: durationOption[] = [
 ];
 
 function NewTransfer() {
-  const history = useHistory();
   const [submitErr, setSubmitErr] = useState(false);
   return (
     <>
@@ -56,31 +45,42 @@ function NewTransfer() {
         <Formik
           initialValues={initialValues}
           onSubmit={async (values: NewTransFormVals, actions) => {
-            alert(JSON.stringify(values, null, 2));
+            await POST_NewTransfer(values);
           }}
         >
           {({ isSubmitting }) => (
             <Form>
-              <VStack flexFlow="column" alignItems="center" spacing={3}>
+              <VStack flexFlow="column" alignItems="center" spacing={5}>
                 <Text fontSize={["xl", null, "3xl"]} fontWeight="bold" pb={2}>
                   New Transfer
                 </Text>
-                <Text fontSize={["md", null, "xl"]} textAlign="center">
-                  Enter the phrase you will use to acces your file(s)
-                </Text>
                 <InputField
                   name="phrase"
+                  label="Enter the phrase you will use to access your file(s)"
                   placeholder="Transfer phrase"
                   fontSize={["md", null, "xl"]}
                   validate={validatePhrase}
+                  labelPos="center"
                 />
                 <InputField
                   name="duration"
                   fontSize={["md", null, "xl"]}
                   inputType="radio"
-                  label="Select the duration of the transfer."
+                  label="For how long will it be available?"
+                  labelPos="center"
                   durationOptions={durationOptions}
                 />
+                <Box>
+                  <InputField
+                    name="is_public"
+                    fontSize={["md", null, "xl"]}
+                    inputType="check-box"
+                    label="This transfer is not for myself."
+                  />
+                  <Text fontSize={["xs", null, "sm"]}>
+                    The public question will be asked.
+                  </Text>
+                </Box>
                 {submitErr && (
                   <Alert status="error" textAlign="center">
                     There was an error processing your request. Please try
