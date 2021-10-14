@@ -24,14 +24,14 @@ export const DI = {} as {
   transferRepository: EntityRepository<Transfer>;
 };
 
-const main = async () => {
+let main = async () => {
   DI.orm = await MikroORM.init(microConfig);
   DI.em = DI.orm.em;
   DI.userRepository = DI.orm.em.getRepository(User);
   DI.questionRepository = DI.orm.em.getRepository(Question);
   DI.transferRepository = DI.orm.em.getRepository(Transfer);
 
-  const app = express();
+  let app = express();
 
   app.use(logger("dev"));
   app.use(express.json());

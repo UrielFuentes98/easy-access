@@ -11,31 +11,37 @@ export async function saveNewTransfer(
   reqUser: Express.User
 ): Promise<boolean> {
   try {
-    const registeredUser = await DI.userRepository.findOne({
-      issuer: reqUser.issuer,
-    });
-
-    if (registeredUser) {
-      const isTransferWithPhrase = await DI.transferRepository.findOne({
-        phrase: transfer.phrase,
-        owner: registeredUser.id,
+    if (await canAddTransfer(transfer)) {
+      const registeredUser = await DI.userRepository.findOne({
+        issuer: reqUser.issuer,
       });
-
-      if (isTransferWithPhrase) {
-        return false;
+      if (registeredUser) {
+        const newTransfer = DI.transferRepository.create({
+          ...transfer,
+          owner: registeredUser.id,
+        });
+        await DI.transferRepository.persistAndFlush(newTransfer);
+        return true;
       }
-      const newTransfer = DI.transferRepository.create({
-        ...transfer,
-        owner: registeredUser.id,
-      });
-
-      await DI.transferRepository.persistAndFlush(newTransfer);
-      return true;
     }
-
     return false;
   } catch (err) {
     console.error(err);
     return false;
   }
+}
+
+async function canAddTransfer(transfer: Transfer): Promise<boolean> {
+  const transfersWithPhrase = await DI.transferRepository.find({
+    phrase: transfer.phrase,
+  });
+
+  const activeTransfers = transfersWithPhrase.filter((transfer) => {
+    let minimumSartDate = new Date();
+    minimumSartDate.setMinutes(
+      minimumSartDate.getMinutes() - transfer.duration
+    );
+    return transfer.createdAt >= minimumSartDate;
+  });
+  return activeTransfers.length === 0;
 }
