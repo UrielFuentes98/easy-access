@@ -3,7 +3,8 @@ import { Alert, Button, Text } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
 import { durationOption, InputField } from "features";
 import { useState } from "react";
-import { POST_NewTransfer } from "app/utils/api";
+import { POST_NewTransfer, ResponseBody } from "app/utils/api";
+import { useHistory } from "react-router-dom";
 
 export interface NewTransFormVals {
   phrase: string;
@@ -28,11 +29,13 @@ function validatePhrase(value: string) {
 const durationOptions: durationOption[] = [
   { value: "15", placeholder: "15 minutes" },
   { value: "180", placeholder: "3 hours" },
-  { value: "1140", placeholder: "1 day" },
+  { value: "1440", placeholder: "1 day" },
 ];
 
 function NewTransfer() {
+  const history = useHistory();
   const [submitErr, setSubmitErr] = useState(false);
+  const [errMsg, setErrMsg] = useState("");
   return (
     <>
       <Box
@@ -45,7 +48,13 @@ function NewTransfer() {
         <Formik
           initialValues={initialValues}
           onSubmit={async (values: NewTransFormVals, actions) => {
-            await POST_NewTransfer(values);
+            const response = await POST_NewTransfer(values);
+            if (response.ok) {
+              history.push("/home");
+            } else {
+              const body: ResponseBody = await response.json();
+              setErrMsg(body.message);
+            }
           }}
         >
           {({ isSubmitting }) => (
@@ -81,10 +90,9 @@ function NewTransfer() {
                     The public question will be asked.
                   </Text>
                 </Box>
-                {submitErr && (
+                {errMsg && (
                   <Alert status="error" textAlign="center">
-                    There was an error processing your request. Please try
-                    again.
+                    {errMsg}
                   </Alert>
                 )}
                 <Button type="submit" isLoading={isSubmitting}>

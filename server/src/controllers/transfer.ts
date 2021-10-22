@@ -1,47 +1,54 @@
+import { Transfer } from "src/entities";
+import {
+  POST_TRANSFER_ERROR,
+  POST_TRANSFER_EXISTED,
+  POST_TRANSFER_OPTIONS,
+  POST_TRANSFER_SUCCESS,
+} from "../constants";
 import { DI } from "../index";
 
-export interface Transfer {
+export interface NewTransfer {
   phrase: string;
   duration: number;
   is_public: boolean;
 }
 
 export async function saveNewTransfer(
-  transfer: Transfer,
+  newTranVals: NewTransfer,
   reqUser: Express.User
-): Promise<boolean> {
+): Promise<POST_TRANSFER_OPTIONS> {
   try {
-    if (await canAddTransfer(transfer)) {
+    const transfersWithPhrase = await DI.transferRepository.find({
+      phrase: newTranVals.phrase,
+    });
+    if (existsActiveTransfer(transfersWithPhrase) == false) {
       const registeredUser = await DI.userRepository.findOne({
         issuer: reqUser.issuer,
       });
       if (registeredUser) {
         const newTransfer = DI.transferRepository.create({
-          ...transfer,
+          ...newTranVals,
           owner: registeredUser.id,
         });
         await DI.transferRepository.persistAndFlush(newTransfer);
-        return true;
+        return POST_TRANSFER_SUCCESS;
       }
     }
-    return false;
+    return POST_TRANSFER_EXISTED;
   } catch (err) {
     console.error(err);
-    return false;
+    return POST_TRANSFER_ERROR;
   }
 }
 
-async function canAddTransfer(transfer: Transfer): Promise<boolean> {
-  const transfersWithPhrase = await DI.transferRepository.find({
-    phrase: transfer.phrase,
+export function existsActiveTransfer(transfersToCheck: Transfer[]): boolean {
+  const activeTransfers = transfersToCheck.filter((transfer) => {
+    let minimumStartDate = new Date();
+    minimumStartDate.setMinutes(
+      minimumStartDate.getMinutes() - transfer.duration
+    );
+    return transfer.createdAt >= minimumStartDate;
   });
 
-  const activeTransfers = transfersWithPhrase.filter((transfer) => {
-    let minimumSartDate = new Date();
-    minimumSartDate.setMinutes(
-      minimumSartDate.getMinutes() - transfer.duration
-    );
-    return transfer.createdAt >= minimumSartDate;
-  });
-  return activeTransfers.length === 0;
+  return activeTransfers.length > 0;
 }

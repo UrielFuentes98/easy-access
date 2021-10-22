@@ -10,6 +10,7 @@ export async function POST_NewTransfer(newTransFormVals: NewTransFormVals) {
     ...newTransFormVals,
     duration: durationNum,
   };
+
   const response = await fetch("/transfer", {
     method: "POST",
     headers: {
@@ -17,5 +18,5 @@ export async function POST_NewTransfer(newTransFormVals: NewTransFormVals) {
     },
     body: JSON.stringify(postVals),
   });
-  return response.ok;
+  return response;
 }
