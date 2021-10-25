@@ -1,10 +1,5 @@
 import { Transfer } from "src/entities";
-import {
-  POST_TRANSFER_ERROR,
-  POST_TRANSFER_EXISTED,
-  POST_TRANSFER_OPTIONS,
-  POST_TRANSFER_SUCCESS,
-} from "../constants";
+import { POST_TRANSFER_STATUS } from "../constants";
 import { DI } from "../index";
 
 export interface NewTransfer {
@@ -13,10 +8,15 @@ export interface NewTransfer {
   is_public: boolean;
 }
 
+interface newTransferRes {
+  key: POST_TRANSFER_STATUS;
+  new_id?: number;
+}
+
 export async function saveNewTransfer(
   newTranVals: NewTransfer,
   reqUser: Express.User
-): Promise<POST_TRANSFER_OPTIONS> {
+): Promise<newTransferRes> {
   try {
     const transfersWithPhrase = await DI.transferRepository.find({
       phrase: newTranVals.phrase,
@@ -31,13 +31,16 @@ export async function saveNewTransfer(
           owner: registeredUser.id,
         });
         await DI.transferRepository.persistAndFlush(newTransfer);
-        return POST_TRANSFER_SUCCESS;
+        return {
+          key: POST_TRANSFER_STATUS.TRANSFER_SUCCESS,
+          new_id: newTransfer.id,
+        };
       }
     }
-    return POST_TRANSFER_EXISTED;
+    return { key: POST_TRANSFER_STATUS.TRANSFER_EXISTED };
   } catch (err) {
     console.error(err);
-    return POST_TRANSFER_ERROR;
+    return { key: POST_TRANSFER_STATUS.TRANSFER_ERROR };
   }
 }
 

@@ -10,18 +10,28 @@ export interface NewTransFormVals {
   phrase: string;
   duration: string;
   is_public: boolean;
+  file: File;
 }
 
 const initialValues: NewTransFormVals = {
   phrase: "",
   duration: "15",
   is_public: false,
+  file: {} as File,
 };
 
 function validatePhrase(value: string) {
   let error;
   if (!value) {
     error = "You should enter the transfer phrase";
+  }
+  return error;
+}
+
+function validateFile(value: File) {
+  let error;
+  if (!value?.name) {
+    error = "You should upload a file.";
   }
   return error;
 }
@@ -57,7 +67,7 @@ function NewTransfer() {
             }
           }}
         >
-          {({ isSubmitting }) => (
+          {({ isSubmitting, setFieldValue, values }) => (
             <Form>
               <VStack flexFlow="column" alignItems="center" spacing={5}>
                 <Text fontSize={["xl", null, "3xl"]} fontWeight="bold" pb={2}>
@@ -90,6 +100,12 @@ function NewTransfer() {
                     The public question will be asked.
                   </Text>
                 </Box>
+                <InputField
+                  name="file"
+                  inputType="file-upload"
+                  label="Add a file to your transfer."
+                  validate={validateFile}
+                />
                 {errMsg && (
                   <Alert status="error" textAlign="center">
                     {errMsg}

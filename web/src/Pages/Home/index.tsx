@@ -1,16 +1,10 @@
 import { Box, Button, VStack, Text } from "@chakra-ui/react";
-import { Magic } from "magic-sdk";
 import { useEffect } from "react";
-import { Link, useHistory } from "react-router-dom";
-
-const magic = new Magic("pk_live_9CECDC3B1BA34ADB");
+import { Link } from "react-router-dom";
 
 function HomePage() {
-  const history = useHistory();
-
   useEffect(() => {
     async function fetchUserData() {
-      const userMetadata = await magic.user.getMetadata();
       //alert(JSON.stringify(userMetadata, null, 2));
     }
     fetchUserData();

@@ -20,9 +20,9 @@ export interface durationOption {
 type InputFieldProps = InputHTMLAttributes<HTMLInputElement> & {
   label?: string;
   name: string;
-  fontSize: (string | null)[];
-  validate?: (value: string) => string | undefined;
-  inputType?: "select" | "radio" | "check-box";
+  fontSize?: (string | null)[];
+  validate?: (value: any) => string | undefined;
+  inputType?: "select" | "radio" | "check-box" | "file-upload";
   labelPos?: "left" | "center";
   selectOptions?: string[];
   durationOptions?: durationOption[];
@@ -38,7 +38,7 @@ export const InputField: React.FC<InputFieldProps> = ({
   durationOptions,
   ...props
 }) => {
-  const [field, { error, touched }] = useField(props);
+  const [field, { error, touched }, { setValue }] = useField(props);
   return (
     <FormControl isInvalid={!!error && touched}>
       {label && inputType !== "check-box" && (
@@ -81,6 +81,17 @@ export const InputField: React.FC<InputFieldProps> = ({
             {label}
           </FormLabel>
         </Checkbox>
+      ) : inputType === "file-upload" ? (
+        <Input
+          pl={0}
+          id={field.name}
+          name={field.name}
+          onChange={(e) => {
+            setValue(e.currentTarget.files![0]);
+          }}
+          type="file"
+          accept=".pdf, .docx, .jpg, .jpeg, .png"
+        />
       ) : (
         <Input {...field} {...props} id={field.name} fontSize={fontSize} />
       )}
