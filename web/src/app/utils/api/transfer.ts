@@ -1,13 +1,17 @@
-import { NewTransFormVals } from "Pages/NewTransfer";
+import { NewTransferForm } from "Pages/NewTransfer";
+import { ResponseBody } from ".";
 
 interface NewTranSendVals {
   phrase: string;
   is_public: boolean;
   duration: number;
-  file: any;
 }
 
-export async function POST_NewTransfer(newTransFormVals: NewTransFormVals) {
+export interface TransferResponse extends ResponseBody {
+  new_id: number;
+}
+
+export async function POST_NewTransfer(newTransFormVals: NewTransferForm) {
   const sendData = getTransferSendData(newTransFormVals);
 
   const response = await fetch("/transfer", {
@@ -21,18 +25,24 @@ export async function POST_NewTransfer(newTransFormVals: NewTransFormVals) {
 }
 
 function getTransferSendData(
-  newTransFormVals: NewTransFormVals
+  newTransFormVals: NewTransferForm
 ): NewTranSendVals {
   const durationNum = parseInt(newTransFormVals.duration);
-  const fileFormData = new FormData();
-  fileFormData.append("File", newTransFormVals.file);
 
   const sendTransferVals: NewTranSendVals = {
-    phrase: newTransFormVals.phrase,
-    is_public: newTransFormVals.is_public,
+    ...newTransFormVals,
     duration: durationNum,
-    file: Object.fromEntries(fileFormData),
   };
-  console.log("here2", sendTransferVals);
   return sendTransferVals;
+}
+
+export async function POST_SaveFiles(file: File, tran_id: number) {
+  const filesData = new FormData();
+  filesData.append("File", file);
+  filesData.append("tranId", tran_id.toString());
+  const response = await fetch("/transfer/files", {
+    method: "POST",
+    body: filesData,
+  });
+  return response;
 }

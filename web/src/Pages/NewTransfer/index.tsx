@@ -3,17 +3,22 @@ import { Alert, Button, Text } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
 import { durationOption, InputField } from "features";
 import { useState } from "react";
-import { POST_NewTransfer, ResponseBody } from "app/utils/api";
+import {
+  POST_NewTransfer,
+  ResponseBody,
+  TransferResponse,
+} from "app/utils/api";
 import { useHistory } from "react-router-dom";
+import { POST_SaveFiles } from "app/utils/api/transfer";
 
-export interface NewTransFormVals {
+export interface NewTransferForm {
   phrase: string;
   duration: string;
   is_public: boolean;
   file: File;
 }
 
-const initialValues: NewTransFormVals = {
+const initialValues: NewTransferForm = {
   phrase: "",
   duration: "15",
   is_public: false,
@@ -57,12 +62,18 @@ function NewTransfer() {
       >
         <Formik
           initialValues={initialValues}
-          onSubmit={async (values: NewTransFormVals, actions) => {
-            const response = await POST_NewTransfer(values);
-            if (response.ok) {
+          onSubmit={async (values: NewTransferForm, actions) => {
+            const transferResponse = await POST_NewTransfer(values);
+            if (transferResponse.ok) {
+              const responseBody: TransferResponse =
+                await transferResponse.json();
+              const filesResponse = await POST_SaveFiles(
+                values.file,
+                responseBody.new_id
+              );
               history.push("/home");
             } else {
-              const body: ResponseBody = await response.json();
+              const body: ResponseBody = await transferResponse.json();
               setErrMsg(body.message);
             }
           }}

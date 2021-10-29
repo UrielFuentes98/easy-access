@@ -1,13 +1,7 @@
 import { Box, VStack } from "@chakra-ui/layout";
-import {
-  Button,
-  FormControl,
-  FormErrorMessage,
-  Input,
-  Text,
-} from "@chakra-ui/react";
+import { Button, Text } from "@chakra-ui/react";
 import { InputField } from "features";
-import { Field, FieldProps, Form, Formik } from "formik";
+import { Form, Formik } from "formik";
 
 interface PhraseFormVals {
   phrase: string;
