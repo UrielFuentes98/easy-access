@@ -1,6 +1,7 @@
 import { Transfer } from "src/entities";
 import { POST_TRANSFER_STATUS } from "../constants";
 import { DI } from "../index";
+import { v4 as uuidv4 } from "uuid";
 
 export interface NewTransfer {
   phrase: string;
@@ -54,4 +55,42 @@ export function existsActiveTransfer(transfersToCheck: Transfer[]): boolean {
   });
 
   return activeTransfers.length > 0;
+}
+
+export async function saveTransferFiles(
+  file: Express.Multer.File,
+  tranId: string
+): Promise<newTransferRes> {
+  console.log("here");
+  if (await registerFile(file.originalname, tranId))
+    return {
+      key: POST_TRANSFER_STATUS.FILE_SUCCESS,
+    };
+  else
+    return {
+      key: POST_TRANSFER_STATUS.FILE_METADATA_ERROR,
+    };
+}
+
+async function registerFile(
+  fileName: string,
+  trandId: string
+): Promise<boolean> {
+  try {
+    const fileNameParts = fileName.split(".");
+    const originalName = fileNameParts[0];
+    const uuidFileName = `${uuidv4()}.${fileNameParts[1]}`;
+    const tranIdNum = parseInt(trandId);
+
+    const newFileEntry = DI.fileRepository.create({
+      uuid_name: uuidFileName,
+      original_name: originalName,
+      file_transfer: tranIdNum,
+    });
+
+    await DI.fileRepository.persistAndFlush(newFileEntry);
+    return true;
+  } catch (err) {
+    return false;
+  }
 }

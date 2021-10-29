@@ -13,7 +13,7 @@ import passport from "passport";
 
 import { __prod__ } from "./constants";
 import microConfig from "./mikro-orm.config";
-import { Question, Transfer, User } from "./entities";
+import { Question, Transfer, User, File } from "./entities";
 import { transferRouter, userRouter } from "./routes";
 
 export const DI = {} as {
@@ -22,6 +22,7 @@ export const DI = {} as {
   userRepository: EntityRepository<User>;
   questionRepository: EntityRepository<Question>;
   transferRepository: EntityRepository<Transfer>;
+  fileRepository: EntityRepository<File>;
 };
 
 let main = async () => {
@@ -30,6 +31,7 @@ let main = async () => {
   DI.userRepository = DI.orm.em.getRepository(User);
   DI.questionRepository = DI.orm.em.getRepository(Question);
   DI.transferRepository = DI.orm.em.getRepository(Transfer);
+  DI.fileRepository = DI.orm.em.getRepository(File);
 
   let app = express();
 

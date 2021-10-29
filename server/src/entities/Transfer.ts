@@ -1,5 +1,13 @@
-import { Entity, ManyToOne, PrimaryKey, Property } from "@mikro-orm/core";
+import {
+  Collection,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryKey,
+  Property,
+} from "@mikro-orm/core";
 import { User } from "./User";
+import { File } from "./File";
 
 @Entity()
 export class Transfer {
@@ -17,6 +25,9 @@ export class Transfer {
 
   @Property()
   is_public!: boolean;
+
+  @OneToMany(() => File, (file) => file.file_transfer)
+  transfer_files = new Collection<File>(this);
 
   @Property({ type: "date" })
   createdAt = new Date();
