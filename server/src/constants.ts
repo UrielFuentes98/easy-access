@@ -5,27 +5,35 @@ export const MSG_USER_LOGGED_IN = "User was logged in.";
 export const MSG_USER_SIGNED_UP = "User was signed up.";
 export const MSG_USER_NOT_LOGGED_IN = "User is not logged in";
 
-export enum REQ_USER_OPTIONS {
-  USER_NOT_LOGGED_IN = 200,
+export enum REQ_USER {
+  NOT_LOGGED_IN = 200,
 }
 
-export enum POST_TRANSFER_STATUS {
-  TRANSFER_EXISTED = 101,
-  TRANSFER_ERROR = 100,
-  TRANSFER_SUCCESS = 1,
+export enum GET_QUESTIONS {
+  SUCCESS = 1,
+  ERROR = 100,
+}
+
+export enum POST_TRANSFER {
+  EXISTED = 101,
+  ERROR = 100,
+  SUCCESS = 1,
   FILE_SUCCESS = 2,
   FILE_METADATA_ERROR = 110,
 }
 
 let RES_MESSAGES = {} as any;
 
-RES_MESSAGES[POST_TRANSFER_STATUS.TRANSFER_SUCCESS] = "New Transfer saved.";
-RES_MESSAGES[POST_TRANSFER_STATUS.TRANSFER_ERROR] =
-  "Transfer couldn't be saved.";
-RES_MESSAGES[POST_TRANSFER_STATUS.TRANSFER_EXISTED] =
+RES_MESSAGES[POST_TRANSFER.SUCCESS] = "New Transfer saved.";
+RES_MESSAGES[POST_TRANSFER.ERROR] = "Transfer couldn't be saved.";
+RES_MESSAGES[POST_TRANSFER.EXISTED] =
   "Transfer couldn't be saved because a transfer with that phrase is active.";
-RES_MESSAGES[REQ_USER_OPTIONS.USER_NOT_LOGGED_IN] = "User is not logged in";
-RES_MESSAGES[POST_TRANSFER_STATUS.FILE_SUCCESS] = "File saved.";
-RES_MESSAGES[POST_TRANSFER_STATUS.FILE_METADATA_ERROR] =
+RES_MESSAGES[REQ_USER.NOT_LOGGED_IN] = "User is not logged in";
+RES_MESSAGES[POST_TRANSFER.FILE_SUCCESS] = "File saved.";
+RES_MESSAGES[POST_TRANSFER.FILE_METADATA_ERROR] =
   "DB entry couldn't be made for file.";
+
+RES_MESSAGES[GET_QUESTIONS.SUCCESS] = "Questions found.";
+RES_MESSAGES[GET_QUESTIONS.ERROR] =
+  "There was a problem finding the questions.";
 export { RES_MESSAGES };

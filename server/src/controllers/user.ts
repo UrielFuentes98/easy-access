@@ -1,5 +1,18 @@
 import { wrap } from "@mikro-orm/core";
+import { GET_QUESTIONS, RES_MESSAGES } from "../constants";
+import { Question } from "../entities";
 import { DI } from "../index";
+
+interface questionReturnInfo {
+  id: number;
+  question: string;
+}
+
+interface questionsResponse {
+  status: number;
+  message: string;
+  data?: questionReturnInfo[];
+}
 
 export interface UserInfo {
   answer_public?: string;
@@ -37,4 +50,31 @@ export async function saveUserInfo(
     console.error(err);
     return false;
   }
+}
+
+export async function getQuestions(): Promise<questionsResponse> {
+  try {
+    const questions = await DI.questionRepository.findAll();
+    const questionsReturnInfo = getQuestionsReturnInfo(questions);
+    return {
+      status: GET_QUESTIONS.SUCCESS,
+      message: RES_MESSAGES[GET_QUESTIONS.SUCCESS],
+      data: questionsReturnInfo,
+    };
+  } catch (err) {
+    return {
+      status: GET_QUESTIONS.ERROR,
+      message: RES_MESSAGES[GET_QUESTIONS.ERROR],
+    };
+  }
+}
+
+function getQuestionsReturnInfo(questions: Question[]): questionReturnInfo[] {
+  const questionsReturnInfo = questions.map((question) => {
+    return {
+      id: question.id,
+      question: question.question,
+    } as questionReturnInfo;
+  });
+  return questionsReturnInfo;
 }

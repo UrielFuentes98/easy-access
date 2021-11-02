@@ -1,5 +1,5 @@
 import { Transfer } from "src/entities";
-import { POST_TRANSFER_STATUS } from "../constants";
+import { POST_TRANSFER } from "../constants";
 import { DI } from "../index";
 import { v4 as uuidv4 } from "uuid";
 
@@ -10,7 +10,7 @@ export interface NewTransfer {
 }
 
 interface newTransferRes {
-  key: POST_TRANSFER_STATUS;
+  key: POST_TRANSFER;
   new_id?: number;
 }
 
@@ -33,15 +33,15 @@ export async function saveNewTransfer(
         });
         await DI.transferRepository.persistAndFlush(newTransfer);
         return {
-          key: POST_TRANSFER_STATUS.TRANSFER_SUCCESS,
+          key: POST_TRANSFER.SUCCESS,
           new_id: newTransfer.id,
         };
       }
     }
-    return { key: POST_TRANSFER_STATUS.TRANSFER_EXISTED };
+    return { key: POST_TRANSFER.EXISTED };
   } catch (err) {
     console.error(err);
-    return { key: POST_TRANSFER_STATUS.TRANSFER_ERROR };
+    return { key: POST_TRANSFER.ERROR };
   }
 }
 
@@ -64,11 +64,11 @@ export async function saveTransferFiles(
   console.log("here");
   if (await registerFile(file.originalname, tranId))
     return {
-      key: POST_TRANSFER_STATUS.FILE_SUCCESS,
+      key: POST_TRANSFER.FILE_SUCCESS,
     };
   else
     return {
-      key: POST_TRANSFER_STATUS.FILE_METADATA_ERROR,
+      key: POST_TRANSFER.FILE_METADATA_ERROR,
     };
 }
 

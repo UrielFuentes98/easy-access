@@ -1,10 +1,12 @@
 import express from "express";
 import {
+  GET_QUESTIONS,
   MSG_USER_LOGGED_IN,
   MSG_USER_NOT_LOGGED_IN,
   MSG_USER_SIGNED_UP,
 } from "../constants";
-import { saveUserInfo } from "../controllers/user";
+import { StatusCodes } from "http-status-codes";
+import { saveUserInfo, getQuestions } from "../controllers";
 import { passport, magic } from "../utils";
 const router = express.Router();
 
@@ -51,6 +53,15 @@ router.post("/logout", async (req, res) => {
     return res.status(200).end();
   } else {
     return res.status(401).end(MSG_USER_NOT_LOGGED_IN);
+  }
+});
+
+router.get("/questions", async (_req, res) => {
+  const questionEntries = await getQuestions();
+  if (questionEntries.status == GET_QUESTIONS.SUCCESS) {
+    res.status(StatusCodes.OK).json(questionEntries);
+  } else {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(questionEntries);
   }
 });
 
