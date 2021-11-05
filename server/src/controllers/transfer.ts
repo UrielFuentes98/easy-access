@@ -1,7 +1,8 @@
 import { Transfer } from "src/entities";
-import { POST_TRANSFER } from "../constants";
+import { POST_TRANSFER, RES_MESSAGES } from "../constants";
 import { DI } from "../index";
 import { v4 as uuidv4 } from "uuid";
+import { PostTransferResponse } from "src/utils/interfaces";
 
 export interface NewTransfer {
   phrase: string;
@@ -17,7 +18,7 @@ interface newTransferRes {
 export async function saveNewTransfer(
   newTranVals: NewTransfer,
   reqUser: Express.User
-): Promise<newTransferRes> {
+): Promise<PostTransferResponse> {
   try {
     const transfersWithPhrase = await DI.transferRepository.find({
       phrase: newTranVals.phrase,
@@ -34,14 +35,21 @@ export async function saveNewTransfer(
         await DI.transferRepository.persistAndFlush(newTransfer);
         return {
           key: POST_TRANSFER.SUCCESS,
+          message: RES_MESSAGES[POST_TRANSFER.SUCCESS],
           new_id: newTransfer.id,
         };
       }
     }
-    return { key: POST_TRANSFER.EXISTED };
+    return {
+      key: POST_TRANSFER.EXISTED,
+      message: RES_MESSAGES[POST_TRANSFER.EXISTED],
+    };
   } catch (err) {
     console.error(err);
-    return { key: POST_TRANSFER.ERROR };
+    return {
+      key: POST_TRANSFER.ERROR,
+      message: RES_MESSAGES[POST_TRANSFER.ERROR],
+    };
   }
 }
 
@@ -60,15 +68,16 @@ export function existsActiveTransfer(transfersToCheck: Transfer[]): boolean {
 export async function saveTransferFiles(
   file: Express.Multer.File,
   tranId: string
-): Promise<newTransferRes> {
-  console.log("here");
+): Promise<PostTransferResponse> {
   if (await registerFile(file.originalname, tranId))
     return {
       key: POST_TRANSFER.FILE_SUCCESS,
+      message: RES_MESSAGES[POST_TRANSFER.FILE_SUCCESS],
     };
   else
     return {
       key: POST_TRANSFER.FILE_METADATA_ERROR,
+      message: RES_MESSAGES[POST_TRANSFER.FILE_METADATA_ERROR],
     };
 }
 

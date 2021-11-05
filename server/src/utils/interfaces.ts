@@ -3,6 +3,15 @@ export interface responseBody {
   message: string;
 }
 
-export interface respPostTransfer extends responseBody {
+export interface PostTransferResponse extends responseBody {
   new_id?: number;
+}
+
+export interface questionReturnInfo {
+  key: number;
+  value: string;
+}
+
+export interface questionsResponse extends responseBody {
+  data?: questionReturnInfo[];
 }

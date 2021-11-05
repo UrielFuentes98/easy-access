@@ -1,18 +1,8 @@
 import { wrap } from "@mikro-orm/core";
+import { questionReturnInfo, questionsResponse } from "src/utils/interfaces";
 import { GET_QUESTIONS, RES_MESSAGES } from "../constants";
 import { Question } from "../entities";
 import { DI } from "../index";
-
-interface questionReturnInfo {
-  key: number;
-  value: string;
-}
-
-interface questionsResponse {
-  key: number;
-  message: string;
-  data?: questionReturnInfo[];
-}
 
 export interface UserInfo {
   answer_public?: string;
