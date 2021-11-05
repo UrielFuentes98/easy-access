@@ -58,7 +58,7 @@ router.post("/logout", async (req, res) => {
 
 router.get("/questions", async (_req, res) => {
   const questionEntries = await getQuestions();
-  if (questionEntries.status == GET_QUESTIONS.SUCCESS) {
+  if (questionEntries.key == GET_QUESTIONS.SUCCESS) {
     res.status(StatusCodes.OK).json(questionEntries);
   } else {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(questionEntries);

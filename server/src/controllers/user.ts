@@ -4,12 +4,12 @@ import { Question } from "../entities";
 import { DI } from "../index";
 
 interface questionReturnInfo {
-  id: number;
-  question: string;
+  key: number;
+  value: string;
 }
 
 interface questionsResponse {
-  status: number;
+  key: number;
   message: string;
   data?: questionReturnInfo[];
 }
@@ -57,13 +57,13 @@ export async function getQuestions(): Promise<questionsResponse> {
     const questions = await DI.questionRepository.findAll();
     const questionsReturnInfo = getQuestionsReturnInfo(questions);
     return {
-      status: GET_QUESTIONS.SUCCESS,
+      key: GET_QUESTIONS.SUCCESS,
       message: RES_MESSAGES[GET_QUESTIONS.SUCCESS],
       data: questionsReturnInfo,
     };
   } catch (err) {
     return {
-      status: GET_QUESTIONS.ERROR,
+      key: GET_QUESTIONS.ERROR,
       message: RES_MESSAGES[GET_QUESTIONS.ERROR],
     };
   }
@@ -72,8 +72,8 @@ export async function getQuestions(): Promise<questionsResponse> {
 function getQuestionsReturnInfo(questions: Question[]): questionReturnInfo[] {
   const questionsReturnInfo = questions.map((question) => {
     return {
-      id: question.id,
-      question: question.question,
+      key: question.id,
+      value: question.question,
     } as questionReturnInfo;
   });
   return questionsReturnInfo;

@@ -12,7 +12,7 @@ export async function loginUser(didToken: string | null): Promise<string> {
   return message;
 }
 
-export async function completeUserInfo(userData: SignUpFormVals) {
+export async function POST_UserInfo(userData: SignUpFormVals) {
   const response = await fetch("/user/register", {
     method: "POST",
     headers: {
@@ -21,4 +21,9 @@ export async function completeUserInfo(userData: SignUpFormVals) {
     body: JSON.stringify(userData),
   });
   return response.ok;
+}
+
+export async function GET_SecretQuestions() {
+  const response = await fetch("/user/questions");
+  return response;
 }

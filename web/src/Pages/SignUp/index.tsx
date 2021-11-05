@@ -3,9 +3,15 @@ import { useHistory } from "react-router-dom";
 import { Alert, Button, Text } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
 import { InputField } from "features";
-import { useState } from "react";
-import { completeUserInfo as POST_UserInfo } from "app/utils/api/user";
-import { MSG_REQ_ERR } from "app_constants";
+import { useEffect, useState } from "react";
+import {
+  POST_UserInfo,
+  GET_SecretQuestions,
+  ResponseBody,
+  QuestionsResBody,
+} from "app/utils/api";
+import { MSG_QUES_REQ_ERR, MSG_REQ_ERR } from "app_constants";
+import { selectOption } from "features/InputField";
 
 export interface SignUpFormVals {
   answer_public: string;
@@ -20,8 +26,6 @@ const initialValues: SignUpFormVals = {
   question_private: "",
   question_public: "",
 };
-
-const questions: string[] = ["question1?", "question2?", "question3?"];
 
 function validatePrivAnswer(value: string) {
   let error;
@@ -42,6 +46,28 @@ function validatePrivQuestion(value: string) {
 function SignUp() {
   const history = useHistory();
   const [submitErr, setSubmitErr] = useState(false);
+  const [secretQuestions, setSecretQuestions] = useState([] as selectOption[]);
+  const [questionsErrMsg, setQuestionsErrMsg] = useState("");
+
+  useEffect(() => {
+    async function fetchSecretQuestions() {
+      try {
+        const response = await GET_SecretQuestions();
+        if (response.ok) {
+          const resBody: QuestionsResBody = await response.json();
+          setSecretQuestions(resBody.data);
+        } else {
+          const resBody: ResponseBody = await response.json();
+          setQuestionsErrMsg(resBody.message);
+        }
+      } catch (err) {
+        console.error(err.message);
+        setQuestionsErrMsg(MSG_QUES_REQ_ERR);
+      }
+    }
+    fetchSecretQuestions();
+  }, []);
+
   return (
     <>
       <Text
@@ -80,7 +106,7 @@ function SignUp() {
                   placeholder="Select a question"
                   fontSize={["md", null, "xl"]}
                   inputType="select"
-                  selectOptions={questions}
+                  selectOptions={secretQuestions}
                   validate={validatePrivQuestion}
                 />
                 <InputField
@@ -96,7 +122,7 @@ function SignUp() {
                   placeholder="Select a question"
                   fontSize={["md", null, "xl"]}
                   inputType="select"
-                  selectOptions={questions}
+                  selectOptions={secretQuestions}
                 />
                 <InputField
                   name="answer_public"
@@ -104,9 +130,9 @@ function SignUp() {
                   label="Public answer"
                   fontSize={["md", null, "xl"]}
                 />
-                {submitErr && (
+                {(submitErr || questionsErrMsg) && (
                   <Alert status="error" textAlign="center">
-                    {MSG_REQ_ERR}
+                    {(submitErr && MSG_REQ_ERR) || questionsErrMsg}
                   </Alert>
                 )}
                 <Button type="submit" isLoading={isSubmitting}>

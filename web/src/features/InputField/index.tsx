@@ -17,6 +17,11 @@ export interface durationOption {
   placeholder: string;
 }
 
+export interface selectOption {
+  key: number;
+  value: string;
+}
+
 type InputFieldProps = InputHTMLAttributes<HTMLInputElement> & {
   label?: string;
   name: string;
@@ -24,7 +29,7 @@ type InputFieldProps = InputHTMLAttributes<HTMLInputElement> & {
   validate?: (value: any) => string | undefined;
   inputType?: "select" | "radio" | "check-box" | "file-upload";
   labelPos?: "left" | "center";
-  selectOptions?: string[];
+  selectOptions?: selectOption[];
   durationOptions?: durationOption[];
 };
 
@@ -57,8 +62,8 @@ export const InputField: React.FC<InputFieldProps> = ({
           fontSize={fontSize}
           placeholder={props.placeholder}
         >
-          {selectOptions?.map((question, key) => (
-            <option value={key + 1}>{question}</option>
+          {selectOptions?.map((question) => (
+            <option value={question.key}>{question.value}</option>
           ))}
         </Select>
       ) : inputType === "radio" ? (
