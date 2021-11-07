@@ -14,6 +14,12 @@ export enum GET_QUESTIONS {
   ERROR = 100,
 }
 
+export enum GET_QUESTION {
+  SUCCESS = 1,
+  NOT_FOUND = 2,
+  ERROR = 100,
+}
+
 export enum POST_TRANSFER {
   EXISTED = 101,
   ERROR = 100,
@@ -28,7 +34,7 @@ RES_MESSAGES[POST_TRANSFER.SUCCESS] = "New Transfer saved.";
 RES_MESSAGES[POST_TRANSFER.ERROR] = "Transfer couldn't be saved.";
 RES_MESSAGES[POST_TRANSFER.EXISTED] =
   "Transfer couldn't be saved because a transfer with that phrase is active.";
-RES_MESSAGES[REQ_USER.NOT_LOGGED_IN] = "User is not logged in";
+RES_MESSAGES[REQ_USER.NOT_LOGGED_IN] = "You're not logged in.";
 RES_MESSAGES[POST_TRANSFER.FILE_SUCCESS] = "File saved.";
 RES_MESSAGES[POST_TRANSFER.FILE_METADATA_ERROR] =
   "DB entry couldn't be made for file.";
@@ -36,4 +42,10 @@ RES_MESSAGES[POST_TRANSFER.FILE_METADATA_ERROR] =
 RES_MESSAGES[GET_QUESTIONS.SUCCESS] = "Questions found.";
 RES_MESSAGES[GET_QUESTIONS.ERROR] =
   "There was a problem finding the questions.";
+
+RES_MESSAGES[GET_QUESTION.SUCCESS] = "Transfer found. Sending question.";
+RES_MESSAGES[GET_QUESTION.NOT_FOUND] = "No transfer with that phrase found.";
+RES_MESSAGES[GET_QUESTION.ERROR] =
+  "There was a problem looking for the transfer.";
+
 export { RES_MESSAGES };

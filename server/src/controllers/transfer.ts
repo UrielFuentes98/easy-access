@@ -1,18 +1,16 @@
 import { Transfer } from "src/entities";
-import { POST_TRANSFER, RES_MESSAGES } from "../constants";
+import { GET_QUESTION, POST_TRANSFER, RES_MESSAGES } from "../constants";
 import { DI } from "../index";
 import { v4 as uuidv4 } from "uuid";
-import { PostTransferResponse } from "src/utils/interfaces";
+import {
+  getQuestionResponse,
+  PostTransferResponse,
+} from "src/utils/interfaces";
 
 export interface NewTransfer {
   phrase: string;
   duration: number;
   is_public: boolean;
-}
-
-interface newTransferRes {
-  key: POST_TRANSFER;
-  new_id?: number;
 }
 
 export async function saveNewTransfer(
@@ -54,14 +52,7 @@ export async function saveNewTransfer(
 }
 
 export function existsActiveTransfer(transfersToCheck: Transfer[]): boolean {
-  const activeTransfers = transfersToCheck.filter((transfer) => {
-    let minimumStartDate = new Date();
-    minimumStartDate.setMinutes(
-      minimumStartDate.getMinutes() - transfer.duration
-    );
-    return transfer.createdAt >= minimumStartDate;
-  });
-
+  const activeTransfers = filterActiveTranfers(transfersToCheck);
   return activeTransfers.length > 0;
 }
 
@@ -102,4 +93,65 @@ async function registerFile(
   } catch (err) {
     return false;
   }
+}
+
+export async function getQuestionFromPhrase(
+  phrase: string
+): Promise<getQuestionResponse> {
+  try {
+    const foundTransfersWithPhrase = await DI.transferRepository.find({
+      phrase: phrase,
+    });
+    const activeTransfers = filterActiveTranfers(foundTransfersWithPhrase);
+    if (activeTransfers.length > 0) {
+      if (activeTransfers.length == 1) {
+        const question = await getQuestionFromTransfer(activeTransfers[0]);
+        return {
+          key: GET_QUESTION.SUCCESS,
+          message: RES_MESSAGES[GET_QUESTION.SUCCESS],
+          question,
+        };
+      } else {
+        return {
+          key: GET_QUESTION.ERROR,
+          message: RES_MESSAGES[GET_QUESTION.ERROR],
+        };
+      }
+    } else {
+      return {
+        key: GET_QUESTION.NOT_FOUND,
+        message: RES_MESSAGES[GET_QUESTION.NOT_FOUND],
+      };
+    }
+  } catch (err) {
+    console.error(err.message);
+    return {
+      key: GET_QUESTION.ERROR,
+      message: RES_MESSAGES[GET_QUESTION.ERROR],
+    };
+  }
+}
+
+function filterActiveTranfers(transfersToCheck: Transfer[]): Transfer[] {
+  const activeTransfers = transfersToCheck.filter((transfer) => {
+    let minimumStartDate = new Date();
+    minimumStartDate.setMinutes(
+      minimumStartDate.getMinutes() - transfer.duration
+    );
+    return transfer.createdAt >= minimumStartDate;
+  });
+  console.log();
+  return activeTransfers;
+}
+
+async function getQuestionFromTransfer(transfer: Transfer): Promise<string> {
+  const transferOwner = await DI.userRepository.findOne(
+    {
+      id: transfer.owner.id,
+    },
+    ["question_public", "question_private"]
+  );
+  return transfer.is_public
+    ? transferOwner?.question_public?.question!
+    : transferOwner?.question_private?.question!;
 }

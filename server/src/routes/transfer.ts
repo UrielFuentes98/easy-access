@@ -1,13 +1,17 @@
 import express from "express";
 import multer from "multer";
-import { saveNewTransfer, saveTransferFiles } from "../controllers";
+import {
+  saveNewTransfer,
+  saveTransferFiles,
+  getQuestionFromPhrase,
+} from "../controllers";
 import { StatusCodes } from "http-status-codes";
 import {
   POST_TRANSFER as POST_TRANSFER,
   REQ_USER,
   RES_MESSAGES,
 } from "../constants";
-import { responseBody, PostTransferResponse } from "../utils/interfaces";
+import { responseBody } from "../utils/interfaces";
 
 const router = express.Router();
 const upload = multer();
@@ -44,6 +48,12 @@ router.post("/files", upload.single("File"), async (req, res) => {
     };
     return res.status(StatusCodes.BAD_REQUEST).json(responseObj);
   }
+});
+
+router.get("/question", async (req, res) => {
+  const queryPhrase = req.query.phrase as string;
+  const response = await getQuestionFromPhrase(queryPhrase);
+  res.json(response);
 });
 
 export const transferRouter = router;

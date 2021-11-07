@@ -15,3 +15,7 @@ export interface questionReturnInfo {
 export interface questionsResponse extends responseBody {
   data?: questionReturnInfo[];
 }
+
+export interface getQuestionResponse extends responseBody {
+  question?: string;
+}
