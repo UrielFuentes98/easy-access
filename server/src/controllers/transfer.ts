@@ -109,6 +109,7 @@ export async function getQuestionFromPhrase(
         return {
           key: GET_QUESTION.SUCCESS,
           message: RES_MESSAGES[GET_QUESTION.SUCCESS],
+          transfer_id: activeTransfers[0].id,
           question,
         };
       } else {

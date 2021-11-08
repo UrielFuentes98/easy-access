@@ -18,4 +18,5 @@ export interface questionsResponse extends responseBody {
 
 export interface getQuestionResponse extends responseBody {
   question?: string;
+  transfer_id?: number;
 }
