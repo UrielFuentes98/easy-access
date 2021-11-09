@@ -10,17 +10,17 @@ function App() {
   ));
 
   return (
-    <Container maxW="container.xl" centerContent px={10}>
-      <AppHeader />
-      <VStack position="absolute" top={100} spacing={8}>
-        <BrowserRouter>
+    <BrowserRouter>
+      <Container maxW="container.xl" centerContent px={10}>
+        <AppHeader />
+        <VStack position="absolute" top={100} spacing={8}>
           <Switch>
             {route_pages}
             <Route component={defaultPage}></Route>
           </Switch>
-        </BrowserRouter>
-      </VStack>
-    </Container>
+        </VStack>
+      </Container>
+    </BrowserRouter>
   );
 }
 

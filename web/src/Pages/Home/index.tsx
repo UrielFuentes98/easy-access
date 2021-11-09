@@ -1,4 +1,5 @@
 import { Box, Button, VStack, Text } from "@chakra-ui/react";
+import { SITE_PATHS } from "app/routes";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
@@ -30,7 +31,7 @@ function HomePage() {
           rounded={15}
           p={6}
         >
-          <Link to="/newTransfer">Transfer new file(s)</Link>
+          <Link to={SITE_PATHS.NEW_TRANSFER}>Transfer new file(s)</Link>
         </Button>
       </VStack>
     </Box>

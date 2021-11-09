@@ -12,6 +12,7 @@ import {
 } from "app/utils/api";
 import { MSG_QUES_REQ_ERR, MSG_REQ_ERR } from "app_constants";
 import { selectOption } from "features/InputField";
+import { SITE_PATHS } from "app/routes";
 
 export interface SignUpFormVals {
   answer_public: string;
@@ -61,6 +62,7 @@ function SignUp() {
           setQuestionsErrMsg(resBody.message);
         }
       } catch (err) {
+        // @ts-ignore
         console.error(err.message);
         setQuestionsErrMsg(MSG_QUES_REQ_ERR);
       }
@@ -90,7 +92,7 @@ function SignUp() {
           onSubmit={async (values: SignUpFormVals, actions) => {
             let result = await POST_UserInfo(values);
             if (result) {
-              history.push("/home");
+              history.push(SITE_PATHS.HOME);
             } else {
               setSubmitErr(true);
             }

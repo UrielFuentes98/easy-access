@@ -11,6 +11,7 @@ import {
   RES_USER_LOGGED_IN,
   RES_USER_SIGNED_UP,
 } from "app_constants";
+import { SITE_PATHS } from "app/routes";
 
 interface SignInFormVals {
   email: string;
@@ -42,9 +43,9 @@ function SignIn() {
         const didToken = await magic.user.getIdToken();
         const message = await loginUser(didToken);
         if (message === RES_USER_LOGGED_IN) {
-          history.push("/home");
+          history.push(SITE_PATHS.HOME);
         } else if (message === RES_USER_SIGNED_UP) {
-          history.push("/signup");
+          history.push(SITE_PATHS.SIGN_UP);
         }
       }
     }
@@ -66,9 +67,9 @@ function SignIn() {
           const didToken = await magic.auth.loginWithMagicLink({ email });
           const message = await loginUser(didToken);
           if (message === RES_USER_LOGGED_IN) {
-            history.push("/home");
+            history.push(SITE_PATHS.HOME);
           } else if (message === RES_USER_SIGNED_UP) {
-            history.push("/signup");
+            history.push(SITE_PATHS.SIGN_UP);
           } else {
             setSubmitErr(true);
           }

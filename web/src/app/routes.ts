@@ -6,25 +6,32 @@ interface PagePath {
   page: FC;
 }
 
+export const SITE_PATHS = {
+  LANDING: "/",
+  HOME: "/home",
+  SIGN_UP: "/signup",
+  NEW_TRANSFER: "/newtransfer",
+  QUESTION: "/question",
+};
 export const routes: PagePath[] = [
   {
-    path: "/",
+    path: SITE_PATHS.LANDING,
     page: LandingPage,
   },
   {
-    path: "/home",
+    path: SITE_PATHS.HOME,
     page: HomePage,
   },
   {
-    path: "/signup",
+    path: SITE_PATHS.SIGN_UP,
     page: SignUp,
   },
   {
-    path: "/newtransfer",
+    path: SITE_PATHS.NEW_TRANSFER,
     page: NewTransfer,
   },
   {
-    path: "/question",
+    path: SITE_PATHS.QUESTION,
     page: Question,
   },
 ];

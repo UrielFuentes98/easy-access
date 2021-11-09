@@ -10,6 +10,7 @@ import {
 } from "app/utils/api";
 import { useHistory } from "react-router-dom";
 import { POST_SaveFiles } from "app/utils/api/transfer";
+import { SITE_PATHS } from "app/routes";
 
 export interface NewTransferForm {
   phrase: string;
@@ -71,7 +72,7 @@ function NewTransfer() {
                 values.file,
                 responseBody.new_id
               );
-              history.push("/home");
+              history.push(SITE_PATHS.HOME);
             } else {
               const body: ResponseBody = await transferResponse.json();
               setErrMsg(body.message);

@@ -12,6 +12,13 @@ export async function loginUser(didToken: string | null): Promise<string> {
   return message;
 }
 
+export async function POST_LogoutUser() {
+  const response = await fetch("/user/logout", {
+    method: "POST",
+  });
+  return response;
+}
+
 export async function POST_UserInfo(userData: SignUpFormVals) {
   const response = await fetch("/user/register", {
     method: "POST",
