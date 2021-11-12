@@ -1,7 +1,13 @@
 import { Box, VStack } from "@chakra-ui/layout";
-import { Button, Text } from "@chakra-ui/react";
+import { Alert, Button, Text } from "@chakra-ui/react";
+import { useAppDispatch } from "app/hooks";
+import { SITE_PATHS } from "app/routes";
 import { InputField } from "features";
 import { Form, Formik } from "formik";
+import { useState } from "react";
+import { useHistory } from "react-router-dom";
+import { GetQuestionRes, GET_QUESTION_KEYS, GET_TransferQuestion } from "./api";
+import { setSecretQuestion, setTransferId } from "./transferAccessSlice";
 
 interface PhraseFormVals {
   phrase: string;
@@ -12,6 +18,10 @@ const initialValues: PhraseFormVals = {
 };
 
 function PhraseInput() {
+  const dispatch = useAppDispatch();
+  const history = useHistory();
+  const [errMsg, setErrMsg] = useState("");
+
   function validatePhrase(value: string) {
     let error;
     if (!value) {
@@ -30,11 +40,18 @@ function PhraseInput() {
     >
       <Formik
         initialValues={initialValues}
-        onSubmit={(values, actions) => {
-          setTimeout(() => {
-            alert(JSON.stringify(values, null, 2));
-            actions.setSubmitting(false);
-          }, 1000);
+        onSubmit={async (values, actions) => {
+          const response: GetQuestionRes = await GET_TransferQuestion(
+            values.phrase
+          );
+          if (response.key === GET_QUESTION_KEYS.SUCCESS) {
+            dispatch(setTransferId(response.transfer_id));
+            dispatch(setSecretQuestion(response.question));
+            history.push(SITE_PATHS.QUESTION);
+          } else {
+            setErrMsg(response.message);
+          }
+          actions.setSubmitting(false);
         }}
       >
         {({ isSubmitting }) => (
@@ -52,7 +69,11 @@ function PhraseInput() {
                 fontSize={["md", null, "xl"]}
                 validate={validatePhrase}
               />
-
+              {errMsg && (
+                <Alert status="error" textAlign="center">
+                  {errMsg}
+                </Alert>
+              )}
               <Button type="submit" isLoading={isSubmitting}>
                 Submit
               </Button>

@@ -6,7 +6,7 @@ export { GET_SecretQuestions, POST_UserInfo, POST_LogoutUser } from "./user";
 export type { TransferResponse } from "./transfer";
 
 export interface ResponseBody {
-  key: string;
+  key: number;
   message: string;
 }
 

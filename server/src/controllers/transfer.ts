@@ -119,6 +119,7 @@ export async function getQuestionFromPhrase(
         };
       }
     } else {
+      console.log("here");
       return {
         key: GET_QUESTION.NOT_FOUND,
         message: RES_MESSAGES[GET_QUESTION.NOT_FOUND],
@@ -134,6 +135,7 @@ export async function getQuestionFromPhrase(
 }
 
 function filterActiveTranfers(transfersToCheck: Transfer[]): Transfer[] {
+  console.log(transfersToCheck);
   const activeTransfers = transfersToCheck.filter((transfer) => {
     let minimumStartDate = new Date();
     minimumStartDate.setMinutes(

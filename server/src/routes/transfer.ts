@@ -53,7 +53,7 @@ router.post("/files", upload.single("File"), async (req, res) => {
 router.get("/question", async (req, res) => {
   const queryPhrase = req.query.phrase as string;
   const response = await getQuestionFromPhrase(queryPhrase);
-  res.json(response);
+  res.status(StatusCodes.OK).json(response);
 });
 
 export const transferRouter = router;

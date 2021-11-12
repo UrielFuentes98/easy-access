@@ -31,6 +31,7 @@ function getTransferSendData(
 
   const sendTransferVals: NewTranSendVals = {
     ...newTransFormVals,
+    phrase: newTransFormVals.phrase.trim(),
     duration: durationNum,
   };
   return sendTransferVals;
