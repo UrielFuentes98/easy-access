@@ -1,7 +1,17 @@
 import { Box, VStack } from "@chakra-ui/layout";
-import { Button, Text } from "@chakra-ui/react";
+import { Alert, Button, Text } from "@chakra-ui/react";
+import { useAppDispatch, useAppSelector } from "app/hooks";
+import { SITE_PATHS } from "app/routes";
 import { InputField } from "features";
 import { Form, Formik } from "formik";
+import { selectSecretQuestion } from "Pages/Landing/PhraseInput";
+import {
+  selectTransferId,
+  setAccessStatus,
+} from "Pages/Landing/PhraseInput/transferAccessSlice";
+import { useState } from "react";
+import { useHistory } from "react-router-dom";
+import { GET_ValdiateAnswer, ValAnswerRes, VAL_ANSWER_KEYS } from "./api";
 
 interface QuestionAsking {
   answer: string;
@@ -12,6 +22,12 @@ const initialValues: QuestionAsking = {
 };
 
 function Question() {
+  const history = useHistory();
+  const dispatch = useAppDispatch();
+  const question = useAppSelector(selectSecretQuestion);
+  const transferId = useAppSelector(selectTransferId);
+  const [errMsg, setErrMsg] = useState("");
+
   function validateAnswer(value: string) {
     let error;
     if (!value) {
@@ -30,11 +46,17 @@ function Question() {
     >
       <Formik
         initialValues={initialValues}
-        onSubmit={(values, actions) => {
-          setTimeout(() => {
-            alert(JSON.stringify(values, null, 2));
-            actions.setSubmitting(false);
-          }, 1000);
+        onSubmit={async (values) => {
+          const response: ValAnswerRes = await GET_ValdiateAnswer(
+            transferId,
+            values.answer
+          );
+          if (response.key === VAL_ANSWER_KEYS.SUCCESS) {
+            dispatch(setAccessStatus(true));
+            history.push(SITE_PATHS.GET_TRANSFER);
+          } else {
+            setErrMsg(response.message);
+          }
         }}
       >
         {({ isSubmitting }) => (
@@ -44,7 +66,7 @@ function Question() {
                 Secret Question
               </Text>
               <Text fontSize={["md", null, "xl"]} textAlign="center">
-                Question?
+                {question}
               </Text>
               <InputField
                 name="answer"
@@ -52,6 +74,11 @@ function Question() {
                 fontSize={["md", null, "xl"]}
                 validate={validateAnswer}
               />
+              {errMsg && (
+                <Alert status="error" textAlign="center">
+                  {errMsg}
+                </Alert>
+              )}
               <Button type="submit" isLoading={isSubmitting}>
                 Submit
               </Button>

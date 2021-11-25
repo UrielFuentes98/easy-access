@@ -11,7 +11,7 @@ export interface GetQuestionRes extends ResponseBody {
 }
 
 export enum GET_QUESTION_KEYS {
-  SUCCESS = 1,
-  NOT_FOUND = 2,
-  ERROR = 100,
+  SUCCESS = 10,
+  NOT_FOUND = 11,
+  ERROR = 200,
 }

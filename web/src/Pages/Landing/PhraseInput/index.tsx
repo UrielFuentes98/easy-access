@@ -9,6 +9,8 @@ import { useHistory } from "react-router-dom";
 import { GetQuestionRes, GET_QUESTION_KEYS, GET_TransferQuestion } from "./api";
 import { setSecretQuestion, setTransferId } from "./transferAccessSlice";
 
+export { selectSecretQuestion } from "./transferAccessSlice";
+
 interface PhraseFormVals {
   phrase: string;
 }

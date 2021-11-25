@@ -1,3 +1,5 @@
+import { responseBody } from "./utils/interfaces";
+
 export const __prod__ = process.env.NODE_ENV === "production";
 export const MAGIC_SECRET_KEY = "sk_live_CC7317BA37549258";
 
@@ -15,18 +17,26 @@ export enum GET_QUESTIONS {
 }
 
 export enum GET_QUESTION {
-  SUCCESS = 1,
-  NOT_FOUND = 2,
-  ERROR = 100,
+  SUCCESS = 10,
+  NOT_FOUND = 11,
+  ERROR = 200,
+}
+
+export enum VAL_ANSWER {
+  SUCCESS = 20,
+  NOT_FOUND = 21,
+  ERROR = 300,
 }
 
 export enum POST_TRANSFER {
-  EXISTED = 101,
-  ERROR = 100,
-  SUCCESS = 1,
-  FILE_SUCCESS = 2,
-  FILE_METADATA_ERROR = 110,
+  SUCCESS = 30,
+  FILE_SUCCESS = 31,
+  FILE_METADATA_ERROR = 410,
+  EXISTED = 401,
+  ERROR = 402,
 }
+
+const BAD_REQ_KEY = 400;
 
 let RES_MESSAGES = {} as any;
 
@@ -48,4 +58,13 @@ RES_MESSAGES[GET_QUESTION.NOT_FOUND] = "No transfer with that phrase found.";
 RES_MESSAGES[GET_QUESTION.ERROR] =
   "There was a problem looking for the transfer.";
 
+RES_MESSAGES[VAL_ANSWER.SUCCESS] = "Answer to question was correct.";
+RES_MESSAGES[VAL_ANSWER.NOT_FOUND] = "Error ocurred with data.";
+RES_MESSAGES[VAL_ANSWER.ERROR] = "Wrong answer. Try again.";
+
 export { RES_MESSAGES };
+
+export const BAD_REQ_RES = {
+  key: BAD_REQ_KEY,
+  message: "Error in communication ocurred.",
+} as responseBody;

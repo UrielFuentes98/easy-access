@@ -4,3 +4,4 @@ export { default as HomePage } from "./Home";
 export { default as SignUp } from "./SignUp";
 export { default as NewTransfer } from "./NewTransfer";
 export { default as Question } from "./Question";
+export { default as GetTransfer } from "./GetTransfer";

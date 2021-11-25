@@ -1,11 +1,17 @@
-import { Transfer } from "src/entities";
-import { GET_QUESTION, POST_TRANSFER, RES_MESSAGES } from "../constants";
+import { Transfer } from "../entities/";
+import {
+  GET_QUESTION,
+  POST_TRANSFER,
+  RES_MESSAGES,
+  VAL_ANSWER,
+} from "../constants";
 import { DI } from "../index";
 import { v4 as uuidv4 } from "uuid";
 import {
   getQuestionResponse,
   PostTransferResponse,
-} from "src/utils/interfaces";
+  valAnswerResponse,
+} from "../utils/interfaces";
 
 export interface NewTransfer {
   phrase: string;
@@ -119,7 +125,6 @@ export async function getQuestionFromPhrase(
         };
       }
     } else {
-      console.log("here");
       return {
         key: GET_QUESTION.NOT_FOUND,
         message: RES_MESSAGES[GET_QUESTION.NOT_FOUND],
@@ -134,8 +139,43 @@ export async function getQuestionFromPhrase(
   }
 }
 
+export async function validateQuestionAnswer(
+  transferId: number,
+  answer: string
+): Promise<valAnswerResponse> {
+  let validAnswer: boolean = false;
+  const transfer = await DI.transferRepository.findOne({ id: transferId }, [
+    "owner",
+  ]);
+  if (transfer) {
+    if (transfer.is_public) {
+      validAnswer = answer === transfer.owner.answer_public;
+    } else {
+      validAnswer = answer === transfer.owner.answer_private;
+    }
+    if (validAnswer) {
+      return {
+        key: VAL_ANSWER.SUCCESS,
+        message: RES_MESSAGES[VAL_ANSWER.SUCCESS],
+        validAnswer,
+      } as valAnswerResponse;
+    } else {
+      return {
+        key: VAL_ANSWER.ERROR,
+        message: RES_MESSAGES[VAL_ANSWER.ERROR],
+        validAnswer,
+      } as valAnswerResponse;
+    }
+  } else {
+    return {
+      key: VAL_ANSWER.NOT_FOUND,
+      message: RES_MESSAGES[VAL_ANSWER.NOT_FOUND],
+      validAnswer,
+    } as valAnswerResponse;
+  }
+}
+
 function filterActiveTranfers(transfersToCheck: Transfer[]): Transfer[] {
-  console.log(transfersToCheck);
   const activeTransfers = transfersToCheck.filter((transfer) => {
     let minimumStartDate = new Date();
     minimumStartDate.setMinutes(

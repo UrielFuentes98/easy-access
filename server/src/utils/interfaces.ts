@@ -20,3 +20,7 @@ export interface getQuestionResponse extends responseBody {
   question?: string;
   transfer_id?: number;
 }
+
+export interface valAnswerResponse extends responseBody {
+  validAnswer: boolean;
+}
