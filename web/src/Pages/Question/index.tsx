@@ -7,7 +7,7 @@ import { Form, Formik } from "formik";
 import { selectSecretQuestion } from "Pages/Landing/PhraseInput";
 import {
   selectTransferId,
-  setAccessStatus,
+  setTranAccessId,
 } from "Pages/Landing/PhraseInput/transferAccessSlice";
 import { useState } from "react";
 import { useHistory } from "react-router-dom";
@@ -52,7 +52,7 @@ function Question() {
             values.answer
           );
           if (response.key === VAL_ANSWER_KEYS.SUCCESS) {
-            dispatch(setAccessStatus(true));
+            dispatch(setTranAccessId(response.tran_access_id!));
             history.push(SITE_PATHS.GET_TRANSFER);
           } else {
             setErrMsg(response.message);

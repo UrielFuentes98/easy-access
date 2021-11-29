@@ -22,5 +22,5 @@ export interface getQuestionResponse extends responseBody {
 }
 
 export interface valAnswerResponse extends responseBody {
-  validAnswer: boolean;
+  tran_access_id?: string;
 }

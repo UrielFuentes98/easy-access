@@ -15,6 +15,9 @@ export class Transfer {
   id!: number;
 
   @Property()
+  access_id!: string;
+
+  @Property()
   phrase!: string;
 
   @Property()

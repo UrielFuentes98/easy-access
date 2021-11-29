@@ -35,6 +35,7 @@ export async function saveNewTransfer(
         const newTransfer = DI.transferRepository.create({
           ...newTranVals,
           owner: registeredUser.id,
+          access_id: uuidv4(),
         });
         await DI.transferRepository.persistAndFlush(newTransfer);
         return {
@@ -157,20 +158,18 @@ export async function validateQuestionAnswer(
       return {
         key: VAL_ANSWER.SUCCESS,
         message: RES_MESSAGES[VAL_ANSWER.SUCCESS],
-        validAnswer,
+        tran_access_id: transfer.access_id,
       } as valAnswerResponse;
     } else {
       return {
         key: VAL_ANSWER.ERROR,
         message: RES_MESSAGES[VAL_ANSWER.ERROR],
-        validAnswer,
       } as valAnswerResponse;
     }
   } else {
     return {
       key: VAL_ANSWER.NOT_FOUND,
       message: RES_MESSAGES[VAL_ANSWER.NOT_FOUND],
-      validAnswer,
     } as valAnswerResponse;
   }
 }

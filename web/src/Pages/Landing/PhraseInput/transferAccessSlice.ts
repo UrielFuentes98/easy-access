@@ -5,14 +5,14 @@ export interface TransferAccessState {
   transfer_id: number;
   secretQuestion: string;
   answer: string;
-  access_authorized: boolean;
+  tranAccessId: string;
 }
 
 const initialState: TransferAccessState = {
   transfer_id: 0,
   secretQuestion: "",
   answer: "",
-  access_authorized: false,
+  tranAccessId: "",
 };
 
 export const transferAccessSlice = createSlice({
@@ -28,13 +28,13 @@ export const transferAccessSlice = createSlice({
     setAnswer: (state, action: PayloadAction<string>) => {
       state.answer = action.payload;
     },
-    setAccessStatus: (state, action: PayloadAction<boolean>) => {
-      state.access_authorized = action.payload;
+    setTranAccessId: (state, action: PayloadAction<string>) => {
+      state.tranAccessId = action.payload;
     },
   },
 });
 
-export const { setTransferId, setSecretQuestion, setAnswer, setAccessStatus } =
+export const { setTransferId, setSecretQuestion, setAnswer, setTranAccessId } =
   transferAccessSlice.actions;
 
 export const selectSecretQuestion = (state: RootState) =>
@@ -45,7 +45,7 @@ export const selectTransferId = (state: RootState) =>
 
 export const selectAnswer = (state: RootState) => state.transferAccess.answer;
 
-export const selectAccessState = (state: RootState) =>
-  state.transferAccess.access_authorized;
+export const selectTranAccessId = (state: RootState) =>
+  state.transferAccess.tranAccessId;
 
 export default transferAccessSlice.reducer;

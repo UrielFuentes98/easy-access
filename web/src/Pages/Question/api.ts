@@ -8,7 +8,7 @@ export async function GET_ValdiateAnswer(tranId: number, answer: string) {
 }
 
 export interface ValAnswerRes extends ResponseBody {
-  validAnswer: boolean;
+  tran_access_id?: string;
 }
 
 export enum VAL_ANSWER_KEYS {
