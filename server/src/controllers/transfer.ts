@@ -7,11 +7,13 @@ import {
 } from "../constants";
 import { DI } from "../index";
 import { v4 as uuidv4 } from "uuid";
+import fs from "fs";
 import {
   getQuestionResponse,
   PostTransferResponse,
   valAnswerResponse,
 } from "../utils/interfaces";
+import { PutObjectRequest } from "aws-sdk/clients/s3";
 
 export interface NewTransfer {
   phrase: string;
@@ -67,39 +69,59 @@ export async function saveTransferFiles(
   file: Express.Multer.File,
   tranId: string
 ): Promise<PostTransferResponse> {
-  if (await registerFile(file.originalname, tranId))
-    return {
-      key: POST_TRANSFER.FILE_SUCCESS,
-      message: RES_MESSAGES[POST_TRANSFER.FILE_SUCCESS],
-    };
-  else
-    return {
-      key: POST_TRANSFER.FILE_METADATA_ERROR,
-      message: RES_MESSAGES[POST_TRANSFER.FILE_METADATA_ERROR],
-    };
+  if (await registerFile(file.originalname, tranId)) {
+    if (await saveFileToS3(file, tranId)) {
+      return {
+        key: POST_TRANSFER.FILE_SUCCESS,
+        message: RES_MESSAGES[POST_TRANSFER.FILE_SUCCESS],
+      };
+    }
+  }
+  return {
+    key: POST_TRANSFER.FILE_ERROR,
+    message: RES_MESSAGES[POST_TRANSFER.FILE_ERROR],
+  };
 }
 
 async function registerFile(
   fileName: string,
   trandId: string
 ): Promise<boolean> {
+  const tranIdNum = parseInt(trandId);
   try {
-    const fileNameParts = fileName.split(".");
-    const originalName = fileNameParts[0];
-    const uuidFileName = `${uuidv4()}.${fileNameParts[1]}`;
-    const tranIdNum = parseInt(trandId);
-
     const newFileEntry = DI.fileRepository.create({
-      uuid_name: uuidFileName,
-      original_name: originalName,
+      name: fileName,
       file_transfer: tranIdNum,
     });
 
     await DI.fileRepository.persistAndFlush(newFileEntry);
     return true;
   } catch (err) {
+    console.error(err);
     return false;
   }
+}
+
+async function saveFileToS3(
+  file: Express.Multer.File,
+  tranId: string
+): Promise<boolean> {
+  const objectKey = `transfer_${tranId}/${file.originalname}`;
+  const params: PutObjectRequest = {
+    Bucket: process.env.BUCKET_NAME!,
+    Key: objectKey,
+    Body: fs.createReadStream(file.path),
+  };
+  try {
+    const data = await DI.S3_API.upload(params).promise();
+    console.log(`File uploaded successfully at ${data.Location}`);
+  } catch (err) {
+    console.log("Error occured while trying to upload to S3 bucket", err);
+    return false;
+  } finally {
+    fs.unlinkSync(file.path); // Empty temp folder
+  }
+  return true;
 }
 
 export async function getQuestionFromPhrase(

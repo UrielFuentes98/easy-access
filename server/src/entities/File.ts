@@ -7,10 +7,7 @@ export class File {
   id!: number;
 
   @Property()
-  uuid_name!: string;
-
-  @Property()
-  original_name!: string;
+  name!: string;
 
   @ManyToOne(() => Transfer)
   file_transfer!: Transfer;

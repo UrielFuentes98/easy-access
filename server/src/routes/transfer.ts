@@ -16,7 +16,10 @@ import { responseBody } from "../utils/interfaces";
 import { validateQuestionAnswer } from "../controllers/transfer";
 
 const router = express.Router();
-const upload = multer();
+const upload = multer({
+  dest: "temp/",
+  limits: { fieldSize: 8 * 1024 * 1024 },
+});
 
 router.post("/", async (req, res) => {
   if (req.isAuthenticated()) {
@@ -41,7 +44,7 @@ router.post("/files", upload.single("File"), async (req, res) => {
     if (response.key === POST_TRANSFER.FILE_SUCCESS) {
       return res.status(StatusCodes.OK).json(response);
     } else {
-      return res.status(StatusCodes.BAD_REQUEST).json(response);
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(response);
     }
   } else {
     const responseObj: responseBody = {

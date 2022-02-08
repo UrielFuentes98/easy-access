@@ -8,7 +8,7 @@ export const MSG_USER_SIGNED_UP = "User was signed up.";
 export const MSG_USER_NOT_LOGGED_IN = "User is not logged in";
 
 export enum REQ_USER {
-  NOT_LOGGED_IN = 200,
+  NOT_LOGGED_IN = 500,
 }
 
 export enum GET_QUESTIONS {
@@ -31,7 +31,7 @@ export enum VAL_ANSWER {
 export enum POST_TRANSFER {
   SUCCESS = 30,
   FILE_SUCCESS = 31,
-  FILE_METADATA_ERROR = 410,
+  FILE_ERROR = 410,
   EXISTED = 401,
   ERROR = 402,
 }
@@ -46,9 +46,7 @@ RES_MESSAGES[POST_TRANSFER.EXISTED] =
   "Transfer couldn't be saved because a transfer with that phrase is active.";
 RES_MESSAGES[REQ_USER.NOT_LOGGED_IN] = "You're not logged in.";
 RES_MESSAGES[POST_TRANSFER.FILE_SUCCESS] = "File saved.";
-RES_MESSAGES[POST_TRANSFER.FILE_METADATA_ERROR] =
-  "DB entry couldn't be made for file.";
-
+RES_MESSAGES[POST_TRANSFER.FILE_ERROR] = "Couldn't save file.";
 RES_MESSAGES[GET_QUESTIONS.SUCCESS] = "Questions found.";
 RES_MESSAGES[GET_QUESTIONS.ERROR] =
   "There was a problem finding the questions.";
@@ -59,7 +57,7 @@ RES_MESSAGES[GET_QUESTION.ERROR] =
   "There was a problem looking for the transfer.";
 
 RES_MESSAGES[VAL_ANSWER.SUCCESS] = "Answer to question was correct.";
-RES_MESSAGES[VAL_ANSWER.NOT_FOUND] = "Error ocurred with data.";
+RES_MESSAGES[VAL_ANSWER.NOT_FOUND] = "Error ocurred.";
 RES_MESSAGES[VAL_ANSWER.ERROR] = "Wrong answer. Try again.";
 
 export { RES_MESSAGES };

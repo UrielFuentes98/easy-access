@@ -1,3 +1,4 @@
+import "dotenv/config";
 import "reflect-metadata";
 import express from "express";
 import {
@@ -10,11 +11,17 @@ import cookieParser from "cookie-parser";
 import logger from "morgan";
 import session from "express-session";
 import passport from "passport";
+import AWS from "aws-sdk";
 
 import { __prod__ } from "./constants";
 import microConfig from "./mikro-orm.config";
 import { Question, Transfer, User, File } from "./entities";
 import { transferRouter, userRouter } from "./routes";
+
+const S3 = new AWS.S3({
+  accessKeyId: process.env.ACCESS_KEY_ID,
+  secretAccessKey: process.env.SECRET_ACCESS_KEY,
+});
 
 export const DI = {} as {
   orm: MikroORM;
@@ -23,6 +30,7 @@ export const DI = {} as {
   questionRepository: EntityRepository<Question>;
   transferRepository: EntityRepository<Transfer>;
   fileRepository: EntityRepository<File>;
+  S3_API: AWS.S3;
 };
 
 let main = async () => {
@@ -32,6 +40,7 @@ let main = async () => {
   DI.questionRepository = DI.orm.em.getRepository(Question);
   DI.transferRepository = DI.orm.em.getRepository(Transfer);
   DI.fileRepository = DI.orm.em.getRepository(File);
+  DI.S3_API = S3;
 
   let app = express();
 

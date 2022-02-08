@@ -13,7 +13,6 @@ import { wrap } from "@mikro-orm/core";
 
 const strategy = new MagicStrategy(
   async function (req, magicUser, done) {
-    console.log("strategy");
     const userMetadata = await magic.users.getMetadataByIssuer(
       magicUser.issuer
     );
