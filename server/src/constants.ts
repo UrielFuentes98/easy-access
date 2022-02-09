@@ -31,7 +31,6 @@ export enum VAL_ANSWER {
 export enum POST_TRANSFER {
   SUCCESS = 30,
   FILE_SUCCESS = 31,
-  FILE_ERROR = 410,
   EXISTED = 401,
   ERROR = 402,
 }
@@ -41,12 +40,12 @@ const BAD_REQ_KEY = 400;
 let RES_MESSAGES = {} as any;
 
 RES_MESSAGES[POST_TRANSFER.SUCCESS] = "New Transfer saved.";
-RES_MESSAGES[POST_TRANSFER.ERROR] = "Transfer couldn't be saved.";
+RES_MESSAGES[POST_TRANSFER.ERROR] =
+  "Transfer couldn't be saved. Please try again.";
 RES_MESSAGES[POST_TRANSFER.EXISTED] =
   "Transfer couldn't be saved because a transfer with that phrase is active.";
 RES_MESSAGES[REQ_USER.NOT_LOGGED_IN] = "You're not logged in.";
 RES_MESSAGES[POST_TRANSFER.FILE_SUCCESS] = "File saved.";
-RES_MESSAGES[POST_TRANSFER.FILE_ERROR] = "Couldn't save file.";
 RES_MESSAGES[GET_QUESTIONS.SUCCESS] = "Questions found.";
 RES_MESSAGES[GET_QUESTIONS.ERROR] =
   "There was a problem finding the questions.";

@@ -11,6 +11,7 @@ import fs from "fs";
 import {
   getQuestionResponse,
   PostTransferResponse,
+  responseBody,
   valAnswerResponse,
 } from "../utils/interfaces";
 import { PutObjectRequest } from "aws-sdk/clients/s3";
@@ -68,7 +69,7 @@ export function existsActiveTransfer(transfersToCheck: Transfer[]): boolean {
 export async function saveTransferFiles(
   file: Express.Multer.File,
   tranId: string
-): Promise<PostTransferResponse> {
+): Promise<responseBody> {
   if (await registerFile(file.originalname, tranId)) {
     if (await saveFileToS3(file, tranId)) {
       return {
@@ -77,17 +78,18 @@ export async function saveTransferFiles(
       };
     }
   }
+  await deleteTransfer(parseInt(tranId));
   return {
-    key: POST_TRANSFER.FILE_ERROR,
-    message: RES_MESSAGES[POST_TRANSFER.FILE_ERROR],
+    key: POST_TRANSFER.ERROR,
+    message: RES_MESSAGES[POST_TRANSFER.ERROR],
   };
 }
 
 async function registerFile(
   fileName: string,
-  trandId: string
+  tranId: string
 ): Promise<boolean> {
-  const tranIdNum = parseInt(trandId);
+  const tranIdNum = parseInt(tranId);
   try {
     const newFileEntry = DI.fileRepository.create({
       name: fileName,
@@ -122,6 +124,20 @@ async function saveFileToS3(
     fs.unlinkSync(file.path); // Empty temp folder
   }
   return true;
+}
+
+async function deleteTransfer(tranId: number) {
+  try {
+    const filesToDelte = await DI.fileRepository.find({
+      file_transfer: tranId,
+    });
+    await DI.transferRepository.removeAndFlush(filesToDelte);
+
+    const transferToDelete = await DI.transferRepository.find({ id: tranId });
+    await DI.transferRepository.removeAndFlush(transferToDelete);
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 export async function getQuestionFromPhrase(
