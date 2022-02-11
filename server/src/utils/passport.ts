@@ -42,7 +42,6 @@ const signup = async (
   userMetadata: MagicUserMetadata,
   done: DoneFunc
 ) => {
-  console.log("signup");
   let newUser = {
     issuer: user.issuer,
     email: userMetadata.email,
@@ -50,6 +49,7 @@ const signup = async (
   };
   const userModel = DI.userRepository.create(newUser);
   await DI.userRepository.persistAndFlush(userModel);
+  DI.logger.debug(`User signed up.`);
   return done(null, newUser);
 };
 
@@ -59,7 +59,6 @@ const login = async (
   existingUser: User,
   done: DoneFunc
 ) => {
-  console.log("login");
   /* Replay attack protection (https://go.magic.link/replay-attack) */
   if (magicUser.claim.iat <= existingUser.lastLogin) {
     return done(null, false, {
@@ -70,6 +69,7 @@ const login = async (
     lastLoginAt: magicUser.claim.iat,
   });
   await DI.userRepository.persistAndFlush(existingUser);
+  DI.logger.debug(`User logged in`);
   return done(null, magicUser);
 };
 

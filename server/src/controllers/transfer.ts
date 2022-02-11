@@ -173,7 +173,7 @@ export async function getQuestionFromPhrase(
     if (activeTransfers.length > 0) {
       if (activeTransfers.length == 1) {
         const question = await getQuestionFromTransfer(activeTransfers[0]);
-        DI.logger.info(
+        DI.logger.debug(
           `Question found for phrase '${phrase}'. Transfer Id: ${activeTransfers[0].id}`
         );
         return {
@@ -192,7 +192,7 @@ export async function getQuestionFromPhrase(
         };
       }
     } else {
-      DI.logger.info(`No transfer found for phrase '${phrase}'.`);
+      DI.logger.debug(`No transfer found for phrase '${phrase}'.`);
       return {
         key: GET_QUESTION.NOT_FOUND,
         message: RES_MESSAGES[GET_QUESTION.NOT_FOUND],
@@ -234,14 +234,16 @@ export async function validateQuestionAnswer(
       validAnswer = answer === transfer.owner.answer_private;
     }
     if (validAnswer) {
-      DI.logger.info(`Correct answer provided for transfer id: ${transfer.id}`);
+      DI.logger.debug(
+        `Correct answer provided for transfer id: ${transfer.id}`
+      );
       return {
         key: VAL_ANSWER.SUCCESS,
         message: RES_MESSAGES[VAL_ANSWER.SUCCESS],
         tran_access_id: transfer.access_id,
       } as valAnswerResponse;
     } else {
-      DI.logger.info(`Wrong answer provided for transfer id: ${transfer.id}`);
+      DI.logger.debug(`Wrong answer provided for transfer id: ${transfer.id}`);
       return {
         key: VAL_ANSWER.ERROR,
         message: RES_MESSAGES[VAL_ANSWER.ERROR],

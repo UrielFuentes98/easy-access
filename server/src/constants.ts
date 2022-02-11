@@ -1,3 +1,6 @@
+import { EntityManager, EntityRepository, MikroORM } from "@mikro-orm/core";
+import { Logger } from "winston";
+import { Question, Transfer, User, File } from "./entities";
 import { responseBody } from "./utils/interfaces";
 
 export const __prod__ = process.env.NODE_ENV === "production";
@@ -65,3 +68,14 @@ export const BAD_REQ_RES = {
   key: BAD_REQ_KEY,
   message: "Error in communication ocurred.",
 } as responseBody;
+
+export interface AppDepenInjec {
+  orm: MikroORM;
+  em: EntityManager;
+  userRepository: EntityRepository<User>;
+  questionRepository: EntityRepository<Question>;
+  transferRepository: EntityRepository<Transfer>;
+  fileRepository: EntityRepository<File>;
+  S3_API: AWS.S3;
+  logger: Logger;
+}

@@ -28,10 +28,10 @@ router.post("/login", passport.authenticate("magic"), (req, res) => {
 
 router.get("/", async (req, res) => {
   if (req.isAuthenticated()) {
-    DI.logger.info("User info fetched.");
+    DI.logger.debug("User info fetched.");
     return res.status(200).json(req.user).end();
   } else {
-    DI.logger.info("User wasnt found to fetch.");
+    DI.logger.debug("User wasnt found to fetch.");
     return res.status(401).end(MSG_USER_NOT_LOGGED_IN);
   }
 });
@@ -53,10 +53,10 @@ router.post("/logout", async (req, res) => {
   if (req.isAuthenticated()) {
     await magic.users.logoutByIssuer(req.user.issuer);
     req.logout();
-    DI.logger.info("User logged out.");
+    DI.logger.debug("User logged out.");
     return res.status(200).end();
   } else {
-    DI.logger.info("User wasnt found to logout.");
+    DI.logger.debug("User wasnt found to logout.");
     return res.status(401).end(MSG_USER_NOT_LOGGED_IN);
   }
 });

@@ -33,7 +33,7 @@ export async function saveUserInfo(
         });
       }
 
-      DI.logger.info("User info registered.");
+      DI.logger.debug("User info registered.");
       await DI.userRepository.persistAndFlush(registeredUser);
       return true;
     }
@@ -48,7 +48,7 @@ export async function getQuestions(): Promise<questionsResponse> {
   try {
     const questions = await DI.questionRepository.findAll();
     const questionsReturnInfo = getQuestionsReturnInfo(questions);
-    DI.logger.info(`Questions fetched. ${questions.length} questions.`);
+    DI.logger.debug(`Questions fetched. ${questions.length} questions.`);
 
     return {
       key: GET_QUESTIONS.SUCCESS,
