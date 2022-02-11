@@ -41,6 +41,7 @@ export async function saveNewTransfer(
           access_id: uuidv4(),
         });
         await DI.transferRepository.persistAndFlush(newTransfer);
+        DI.logger.debug(`New Transfer registered. Id: ${newTransfer.id}.`);
         return {
           key: POST_TRANSFER.SUCCESS,
           message: RES_MESSAGES[POST_TRANSFER.SUCCESS],
@@ -48,12 +49,15 @@ export async function saveNewTransfer(
         };
       }
     }
+    DI.logger.debug(
+      `Transfer with phrase ${newTranVals.phrase} already existed.`
+    );
     return {
       key: POST_TRANSFER.EXISTED,
       message: RES_MESSAGES[POST_TRANSFER.EXISTED],
     };
   } catch (err) {
-    console.error(err);
+    DI.logger.error(err);
     return {
       key: POST_TRANSFER.ERROR,
       message: RES_MESSAGES[POST_TRANSFER.ERROR],
@@ -64,6 +68,17 @@ export async function saveNewTransfer(
 export function existsActiveTransfer(transfersToCheck: Transfer[]): boolean {
   const activeTransfers = filterActiveTranfers(transfersToCheck);
   return activeTransfers.length > 0;
+}
+
+function filterActiveTranfers(transfersToCheck: Transfer[]): Transfer[] {
+  const activeTransfers = transfersToCheck.filter((transfer) => {
+    let minimumStartDate = new Date();
+    minimumStartDate.setMinutes(
+      minimumStartDate.getMinutes() - transfer.duration
+    );
+    return transfer.createdAt >= minimumStartDate;
+  });
+  return activeTransfers;
 }
 
 export async function saveTransferFiles(
@@ -97,9 +112,10 @@ async function registerFile(
     });
 
     await DI.fileRepository.persistAndFlush(newFileEntry);
+    DI.logger.debug(`New File registered. Id: ${newFileEntry.id}.`);
     return true;
   } catch (err) {
-    console.error(err);
+    DI.logger.error(err);
     return false;
   }
 }
@@ -116,9 +132,9 @@ async function saveFileToS3(
   };
   try {
     const data = await DI.S3_API.upload(params).promise();
-    console.log(`File uploaded successfully at ${data.Location}`);
+    DI.logger.debug(`File uploaded successfully at ${data.Location}`);
   } catch (err) {
-    console.log("Error occured while trying to upload to S3 bucket", err);
+    DI.logger.error("Error occured while trying to upload to S3 bucket", err);
     return false;
   } finally {
     fs.unlinkSync(file.path); // Empty temp folder
@@ -131,10 +147,16 @@ async function deleteTransfer(tranId: number) {
     const filesToDelte = await DI.fileRepository.find({
       file_transfer: tranId,
     });
+    filesToDelte.forEach((file) =>
+      DI.logger.debug(`File deleted. Id: ${file.id}`)
+    );
     await DI.transferRepository.removeAndFlush(filesToDelte);
 
-    const transferToDelete = await DI.transferRepository.find({ id: tranId });
-    await DI.transferRepository.removeAndFlush(transferToDelete);
+    const transferToDelete = await DI.transferRepository.findOne({
+      id: tranId,
+    });
+    await DI.transferRepository.removeAndFlush(transferToDelete!);
+    DI.logger.debug(`Transfer deleted. Id: ${transferToDelete!.id}`);
   } catch (err) {
     console.log(err);
   }
@@ -151,6 +173,9 @@ export async function getQuestionFromPhrase(
     if (activeTransfers.length > 0) {
       if (activeTransfers.length == 1) {
         const question = await getQuestionFromTransfer(activeTransfers[0]);
+        DI.logger.info(
+          `Question found for phrase '${phrase}'. Transfer Id: ${activeTransfers[0].id}`
+        );
         return {
           key: GET_QUESTION.SUCCESS,
           message: RES_MESSAGES[GET_QUESTION.SUCCESS],
@@ -158,24 +183,40 @@ export async function getQuestionFromPhrase(
           question,
         };
       } else {
+        DI.logger.error(
+          `Phrase '${phrase}' had more than one active transfer.`
+        );
         return {
           key: GET_QUESTION.ERROR,
           message: RES_MESSAGES[GET_QUESTION.ERROR],
         };
       }
     } else {
+      DI.logger.info(`No transfer found for phrase '${phrase}'.`);
       return {
         key: GET_QUESTION.NOT_FOUND,
         message: RES_MESSAGES[GET_QUESTION.NOT_FOUND],
       };
     }
   } catch (err) {
-    console.error(err.message);
+    DI.logger.error(err.message);
     return {
       key: GET_QUESTION.ERROR,
       message: RES_MESSAGES[GET_QUESTION.ERROR],
     };
   }
+}
+
+async function getQuestionFromTransfer(transfer: Transfer): Promise<string> {
+  const transferOwner = await DI.userRepository.findOne(
+    {
+      id: transfer.owner.id,
+    },
+    ["question_public", "question_private"]
+  );
+  return transfer.is_public
+    ? transferOwner?.question_public?.question!
+    : transferOwner?.question_private?.question!;
 }
 
 export async function validateQuestionAnswer(
@@ -193,45 +234,24 @@ export async function validateQuestionAnswer(
       validAnswer = answer === transfer.owner.answer_private;
     }
     if (validAnswer) {
+      DI.logger.info(`Correct answer provided for transfer id: ${transfer.id}`);
       return {
         key: VAL_ANSWER.SUCCESS,
         message: RES_MESSAGES[VAL_ANSWER.SUCCESS],
         tran_access_id: transfer.access_id,
       } as valAnswerResponse;
     } else {
+      DI.logger.info(`Wrong answer provided for transfer id: ${transfer.id}`);
       return {
         key: VAL_ANSWER.ERROR,
         message: RES_MESSAGES[VAL_ANSWER.ERROR],
       } as valAnswerResponse;
     }
   } else {
+    DI.logger.error(`Transfer with id: ${transferId}, wasnt found.`);
     return {
       key: VAL_ANSWER.NOT_FOUND,
       message: RES_MESSAGES[VAL_ANSWER.NOT_FOUND],
     } as valAnswerResponse;
   }
-}
-
-function filterActiveTranfers(transfersToCheck: Transfer[]): Transfer[] {
-  const activeTransfers = transfersToCheck.filter((transfer) => {
-    let minimumStartDate = new Date();
-    minimumStartDate.setMinutes(
-      minimumStartDate.getMinutes() - transfer.duration
-    );
-    return transfer.createdAt >= minimumStartDate;
-  });
-  console.log();
-  return activeTransfers;
-}
-
-async function getQuestionFromTransfer(transfer: Transfer): Promise<string> {
-  const transferOwner = await DI.userRepository.findOne(
-    {
-      id: transfer.owner.id,
-    },
-    ["question_public", "question_private"]
-  );
-  return transfer.is_public
-    ? transferOwner?.question_public?.question!
-    : transferOwner?.question_private?.question!;
 }

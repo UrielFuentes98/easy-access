@@ -1,5 +1,5 @@
 import { wrap } from "@mikro-orm/core";
-import { questionReturnInfo, questionsResponse } from "src/utils/interfaces";
+import { questionReturnInfo, questionsResponse } from "../utils/interfaces";
 import { GET_QUESTIONS, RES_MESSAGES } from "../constants";
 import { Question } from "../entities";
 import { DI } from "../index";
@@ -32,12 +32,14 @@ export async function saveUserInfo(
           answer_public: userInfo.answer_public,
         });
       }
+
+      DI.logger.info("User info registered.");
       await DI.userRepository.persistAndFlush(registeredUser);
       return true;
     }
     return false;
   } catch (err) {
-    console.error(err);
+    DI.logger.error(err);
     return false;
   }
 }
@@ -46,12 +48,15 @@ export async function getQuestions(): Promise<questionsResponse> {
   try {
     const questions = await DI.questionRepository.findAll();
     const questionsReturnInfo = getQuestionsReturnInfo(questions);
+    DI.logger.info(`Questions fetched. ${questions.length} questions.`);
+
     return {
       key: GET_QUESTIONS.SUCCESS,
       message: RES_MESSAGES[GET_QUESTIONS.SUCCESS],
       data: questionsReturnInfo,
     };
   } catch (err) {
+    DI.logger.error(err);
     return {
       key: GET_QUESTIONS.ERROR,
       message: RES_MESSAGES[GET_QUESTIONS.ERROR],

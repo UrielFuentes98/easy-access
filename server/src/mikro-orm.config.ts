@@ -11,5 +11,5 @@ export default {
   entities: [Question, User, Transfer, File],
   dbName: "easy_access",
   type: "postgresql",
-  debug: !__prod__,
+  // debug: !__prod__,
 } as Parameters<typeof MikroORM.init>[0];

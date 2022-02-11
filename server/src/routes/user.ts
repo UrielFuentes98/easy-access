@@ -8,6 +8,7 @@ import {
 import { StatusCodes } from "http-status-codes";
 import { saveUserInfo, getQuestions } from "../controllers";
 import { passport, magic } from "../utils";
+import { DI } from "../";
 const router = express.Router();
 
 /* Attach middleware to login endpoint */
@@ -27,8 +28,10 @@ router.post("/login", passport.authenticate("magic"), (req, res) => {
 
 router.get("/", async (req, res) => {
   if (req.isAuthenticated()) {
+    DI.logger.info("User info fetched.");
     return res.status(200).json(req.user).end();
   } else {
+    DI.logger.info("User wasnt found to fetch.");
     return res.status(401).end(MSG_USER_NOT_LOGGED_IN);
   }
 });
@@ -50,8 +53,10 @@ router.post("/logout", async (req, res) => {
   if (req.isAuthenticated()) {
     await magic.users.logoutByIssuer(req.user.issuer);
     req.logout();
+    DI.logger.info("User logged out.");
     return res.status(200).end();
   } else {
+    DI.logger.info("User wasnt found to logout.");
     return res.status(401).end(MSG_USER_NOT_LOGGED_IN);
   }
 });

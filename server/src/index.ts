@@ -15,8 +15,10 @@ import AWS from "aws-sdk";
 
 import { __prod__ } from "./constants";
 import microConfig from "./mikro-orm.config";
+import { appLogger } from "./loaders";
 import { Question, Transfer, User, File } from "./entities";
 import { transferRouter, userRouter } from "./routes";
+import { Logger } from "winston";
 
 const S3 = new AWS.S3({
   accessKeyId: process.env.ACCESS_KEY_ID,
@@ -31,6 +33,7 @@ export const DI = {} as {
   transferRepository: EntityRepository<Transfer>;
   fileRepository: EntityRepository<File>;
   S3_API: AWS.S3;
+  logger: Logger;
 };
 
 let main = async () => {
@@ -41,6 +44,7 @@ let main = async () => {
   DI.transferRepository = DI.orm.em.getRepository(Transfer);
   DI.fileRepository = DI.orm.em.getRepository(File);
   DI.S3_API = S3;
+  DI.logger = appLogger;
 
   let app = express();
 
@@ -65,10 +69,10 @@ let main = async () => {
   app.use("/user", userRouter);
   app.use("/transfer", transferRouter);
   app.listen(4000, () => {
-    console.log("server started on localhost:4000");
+    appLogger.info("server started on localhost:4000");
   });
 };
 
 main().catch((err) => {
-  console.error(err);
+  appLogger.error(err);
 });
