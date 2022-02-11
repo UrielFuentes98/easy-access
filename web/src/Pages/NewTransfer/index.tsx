@@ -9,7 +9,7 @@ import {
   TransferResponse,
 } from "app/utils/api";
 import { useHistory } from "react-router-dom";
-import { POST_SaveFiles } from "app/utils/api/transfer";
+import { POST_SaveFiles } from "app/utils/api";
 import { SITE_PATHS } from "app/routes";
 
 export interface NewTransferForm {
@@ -66,13 +66,18 @@ function NewTransfer() {
           onSubmit={async (values: NewTransferForm, actions) => {
             const transferResponse = await POST_NewTransfer(values);
             if (transferResponse.ok) {
-              const responseBody: TransferResponse =
+              const newTransferResBody: TransferResponse =
                 await transferResponse.json();
               const filesResponse = await POST_SaveFiles(
                 values.file,
-                responseBody.new_id
+                newTransferResBody.new_id
               );
-              history.push(SITE_PATHS.HOME);
+              if (filesResponse.ok) {
+                history.push(SITE_PATHS.HOME);
+              } else {
+                const filesResBody: ResponseBody = await filesResponse.json();
+                setErrMsg(filesResBody.message);
+              }
             } else {
               const body: ResponseBody = await transferResponse.json();
               setErrMsg(body.message);

@@ -1,6 +1,6 @@
 import { selectOption } from "features/InputField";
 
-export { POST_NewTransfer } from "./transfer";
+export { POST_NewTransfer, POST_SaveFiles, GET_Transfer } from "./transfer";
 export { GET_SecretQuestions, POST_UserInfo, POST_LogoutUser } from "./user";
 
 export type { TransferResponse } from "./transfer";
