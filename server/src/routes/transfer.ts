@@ -1,5 +1,6 @@
 import express from "express";
 import multer from "multer";
+import fs from "fs";
 import {
   saveNewTransfer,
   saveTransferFiles,
@@ -8,12 +9,18 @@ import {
 import { StatusCodes } from "http-status-codes";
 import {
   BAD_REQ_RES,
+  GET_TRANSFER,
   POST_TRANSFER as POST_TRANSFER,
   REQ_USER,
   RES_MESSAGES,
 } from "../constants";
 import { responseBody } from "../utils/interfaces";
-import { validateQuestionAnswer } from "../controllers/transfer";
+import {
+  getTransferFile,
+  validateQuestionAnswer,
+} from "../controllers/transfer";
+import { changeFilePath } from "../controllers/utils";
+import { DI } from "../";
 
 const router = express.Router();
 const upload = multer({
@@ -52,6 +59,23 @@ router.post("/files", upload.single("File"), async (req, res) => {
       message: RES_MESSAGES[REQ_USER.NOT_LOGGED_IN],
     };
     return res.status(StatusCodes.BAD_REQUEST).json(responseObj);
+  }
+});
+
+router.get("/", async (req, res) => {
+  const transferId = parseInt(req.query.transId as string);
+  const accessCode = req.query.accessId as string;
+  const response = await getTransferFile(transferId, accessCode);
+  if (response.key == GET_TRANSFER.SUCCESS) {
+    const newFilePath = changeFilePath(response.tempFileName!);
+    res.status(StatusCodes.OK).sendFile(newFilePath, (err) => {
+      if (err) DI.logger.error(`Error while sending response file.\n${err}`);
+      else {
+        fs.unlinkSync(newFilePath);
+      }
+    });
+  } else {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(response);
   }
 });
 

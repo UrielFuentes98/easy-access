@@ -6,18 +6,26 @@ import cookieParser from "cookie-parser";
 import logger from "morgan";
 import session from "express-session";
 import passport from "passport";
-import AWS from "aws-sdk";
+import fs from "fs";
+import { S3Client } from "@aws-sdk/client-s3";
 
 import { AppDepenInjec, __prod__ } from "./constants";
 import microConfig from "./mikro-orm.config";
 import { appLogger } from "./loaders";
 import { Question, Transfer, User, File } from "./entities";
 import { transferRouter, userRouter } from "./routes";
+import path from "path";
 
 export const DI = {} as AppDepenInjec;
 
 let main = async () => {
   await loadDependencyInjector();
+
+  //create file temp folder
+  fs.mkdir(path.join(__dirname, "/temp"), { recursive: true }, (err) => {
+    if (err) appLogger.error(`Error while creating temp folder.\n${err}`);
+  });
+
   let app = express();
 
   app.use(logger("dev"));
@@ -46,9 +54,11 @@ let main = async () => {
 };
 
 async function loadDependencyInjector() {
-  const S3 = new AWS.S3({
-    accessKeyId: process.env.ACCESS_KEY_ID,
-    secretAccessKey: process.env.SECRET_ACCESS_KEY,
+  const s3Client = new S3Client({
+    credentials: {
+      accessKeyId: process.env.ACCESS_KEY_ID!,
+      secretAccessKey: process.env.SECRET_ACCESS_KEY!,
+    },
   });
 
   DI.orm = await MikroORM.init(microConfig);
@@ -57,7 +67,7 @@ async function loadDependencyInjector() {
   DI.questionRepository = DI.orm.em.getRepository(Question);
   DI.transferRepository = DI.orm.em.getRepository(Transfer);
   DI.fileRepository = DI.orm.em.getRepository(File);
-  DI.S3_API = S3;
+  DI.S3Client = s3Client;
   DI.logger = appLogger;
 }
 

@@ -1,4 +1,5 @@
 import { EntityManager, EntityRepository, MikroORM } from "@mikro-orm/core";
+import { S3Client } from "@aws-sdk/client-s3";
 import { Logger } from "winston";
 import { Question, Transfer, User, File } from "./entities";
 import { responseBody } from "./utils/interfaces";
@@ -38,6 +39,11 @@ export enum POST_TRANSFER {
   ERROR = 402,
 }
 
+export enum GET_TRANSFER {
+  SUCCESS = 40,
+  ERROR = 500,
+}
+
 const BAD_REQ_KEY = 400;
 
 let RES_MESSAGES = {} as any;
@@ -47,6 +53,10 @@ RES_MESSAGES[POST_TRANSFER.ERROR] =
   "Transfer couldn't be saved. Please try again.";
 RES_MESSAGES[POST_TRANSFER.EXISTED] =
   "Transfer couldn't be saved because a transfer with that phrase is active.";
+
+RES_MESSAGES[GET_TRANSFER.SUCCESS] = "Transfer found.";
+RES_MESSAGES[GET_TRANSFER.ERROR] = "There was a problem getting the transfer.";
+
 RES_MESSAGES[REQ_USER.NOT_LOGGED_IN] = "You're not logged in.";
 RES_MESSAGES[POST_TRANSFER.FILE_SUCCESS] = "File saved.";
 RES_MESSAGES[GET_QUESTIONS.SUCCESS] = "Questions found.";
@@ -76,6 +86,6 @@ export interface AppDepenInjec {
   questionRepository: EntityRepository<Question>;
   transferRepository: EntityRepository<Transfer>;
   fileRepository: EntityRepository<File>;
-  S3_API: AWS.S3;
+  S3Client: S3Client;
   logger: Logger;
 }

@@ -1,6 +1,14 @@
+import {
+  GetObjectCommand,
+  GetObjectCommandInput,
+  GetObjectCommandOutput,
+  PutObjectCommand,
+  PutObjectCommandInput,
+} from "@aws-sdk/client-s3";
 import { Transfer } from "../entities/";
 import {
   GET_QUESTION,
+  GET_TRANSFER,
   POST_TRANSFER,
   RES_MESSAGES,
   VAL_ANSWER,
@@ -10,11 +18,13 @@ import { v4 as uuidv4 } from "uuid";
 import fs from "fs";
 import {
   getQuestionResponse,
+  GetTransferResponse,
   PostTransferResponse,
   responseBody,
   valAnswerResponse,
 } from "../utils/interfaces";
-import { PutObjectRequest } from "aws-sdk/clients/s3";
+import { Readable } from "stream";
+import { saveFileLocally } from "./utils";
 
 export interface NewTransfer {
   phrase: string;
@@ -125,14 +135,15 @@ async function saveFileToS3(
   tranId: string
 ): Promise<boolean> {
   const objectKey = `transfer_${tranId}/${file.originalname}`;
-  const params: PutObjectRequest = {
+  const params: PutObjectCommandInput = {
     Bucket: process.env.BUCKET_NAME!,
     Key: objectKey,
     Body: fs.createReadStream(file.path),
   };
   try {
-    const data = await DI.S3_API.upload(params).promise();
-    DI.logger.debug(`File uploaded successfully at ${data.Location}`);
+    const command = new PutObjectCommand(params);
+    await DI.S3Client.send(command);
+    DI.logger.debug("File successfully uploaded.");
   } catch (err) {
     DI.logger.error("Error occured while trying to upload to S3 bucket", err);
     return false;
@@ -160,6 +171,57 @@ async function deleteTransfer(tranId: number) {
   } catch (err) {
     console.log(err);
   }
+}
+
+export async function getTransferFile(
+  tranId: number,
+  accessCode: string
+): Promise<GetTransferResponse> {
+  try {
+    const foundTranfer = await DI.transferRepository.findOne({
+      id: tranId,
+      access_id: accessCode,
+    });
+    if (foundTranfer) {
+      const transferFile = await DI.fileRepository.findOne({
+        file_transfer: foundTranfer.id,
+      });
+      if (transferFile) {
+        const objectKey = `transfer_${transferFile.file_transfer.id}/${transferFile.name}`;
+        const result = await fetchFile(objectKey);
+        if (result.Body instanceof Readable) {
+          const fileName = `tran-${transferFile.file_transfer.id}_${transferFile.name}`;
+          await saveFileLocally(result.Body, fileName);
+          return {
+            key: GET_TRANSFER.SUCCESS,
+            message: RES_MESSAGES[GET_TRANSFER.SUCCESS],
+            tempFileName: fileName,
+          };
+        }
+      }
+    }
+    return {
+      key: GET_TRANSFER.ERROR,
+      message: RES_MESSAGES[GET_TRANSFER.ERROR],
+    };
+  } catch (err) {
+    DI.logger.error(`Error while getting file.\n ${err}`);
+    return {
+      key: GET_TRANSFER.ERROR,
+      message: RES_MESSAGES[GET_TRANSFER.ERROR],
+    };
+  }
+}
+
+async function fetchFile(objectKey: string): Promise<GetObjectCommandOutput> {
+  DI.logger.debug(`File object key to fetch: ${objectKey}`);
+  const params: GetObjectCommandInput = {
+    Bucket: process.env.BUCKET_NAME!,
+    Key: objectKey,
+  };
+  const command = new GetObjectCommand(params);
+  const s3Res = await DI.S3Client.send(command);
+  return s3Res;
 }
 
 export async function getQuestionFromPhrase(
@@ -234,23 +296,21 @@ export async function validateQuestionAnswer(
       validAnswer = answer === transfer.owner.answer_private;
     }
     if (validAnswer) {
-      DI.logger.debug(
-        `Correct answer provided for transfer id: ${transfer.id}`
-      );
+      DI.logger.debug(`Correct answer provided for transfer: ${transfer.id}`);
       return {
         key: VAL_ANSWER.SUCCESS,
         message: RES_MESSAGES[VAL_ANSWER.SUCCESS],
         tran_access_id: transfer.access_id,
       } as valAnswerResponse;
     } else {
-      DI.logger.debug(`Wrong answer provided for transfer id: ${transfer.id}`);
+      DI.logger.debug(`Wrong answer provided for transfer: ${transfer.id}`);
       return {
         key: VAL_ANSWER.ERROR,
         message: RES_MESSAGES[VAL_ANSWER.ERROR],
       } as valAnswerResponse;
     }
   } else {
-    DI.logger.error(`Transfer with id: ${transferId}, wasnt found.`);
+    DI.logger.error(`Transfer: ${transferId}, wasnt found.`);
     return {
       key: VAL_ANSWER.NOT_FOUND,
       message: RES_MESSAGES[VAL_ANSWER.NOT_FOUND],
