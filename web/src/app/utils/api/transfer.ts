@@ -48,9 +48,9 @@ export async function POST_SaveFiles(file: File, tran_id: number) {
   return response;
 }
 
-export async function GET_Transfer(transferId: number, accessId: string) {
+export async function GET_FilesNames(transferId: number, accessId: string) {
   const response = await fetch(
-    `/transfer?transId=${transferId}&accessId=${accessId}`
+    `/transfer/files-names?transId=${transferId}&accessId=${accessId}`
   );
   return response;
 }
