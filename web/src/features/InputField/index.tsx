@@ -86,17 +86,6 @@ export const InputField: React.FC<InputFieldProps> = ({
             {label}
           </FormLabel>
         </Checkbox>
-      ) : inputType === "file-upload" ? (
-        <Input
-          pl={0}
-          id={field.name}
-          name={field.name}
-          onChange={(e) => {
-            setValue(e.currentTarget.files![0]);
-          }}
-          type="file"
-          accept=".pdf, .docx, .jpg, .jpeg, .png"
-        />
       ) : (
         <Input {...field} {...props} id={field.name} fontSize={fontSize} />
       )}

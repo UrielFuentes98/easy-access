@@ -37,15 +37,26 @@ function getTransferSendData(
   return sendTransferVals;
 }
 
-export async function POST_SaveFiles(file: File, tran_id: number) {
+export async function POST_SaveFiles(
+  files: File[],
+  tran_id: number
+): Promise<boolean> {
+  const result = files.every(async (file) => {
+    const fileStatus = await POST_SaveFile(file, tran_id);
+    return fileStatus;
+  });
+  return result;
+}
+
+async function POST_SaveFile(file: File, tran_id: number): Promise<boolean> {
   const filesData = new FormData();
   filesData.append("File", file);
   filesData.append("tranId", tran_id.toString());
-  const response = await fetch("/transfer/files", {
+  const response = await fetch("/transfer/file", {
     method: "POST",
     body: filesData,
   });
-  return response;
+  return response.ok;
 }
 
 export async function GET_FilesNames(transferId: number, accessId: string) {

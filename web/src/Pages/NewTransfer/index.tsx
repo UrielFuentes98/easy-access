@@ -1,5 +1,5 @@
 import { Box, VStack } from "@chakra-ui/layout";
-import { Alert, Button, Text } from "@chakra-ui/react";
+import { Alert, Button, Input, Text } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
 import { durationOption, InputField } from "features";
 import { useState } from "react";
@@ -16,28 +16,20 @@ export interface NewTransferForm {
   phrase: string;
   duration: string;
   is_public: boolean;
-  file: File;
+  files: File[];
 }
 
 const initialValues: NewTransferForm = {
   phrase: "",
   duration: "15",
   is_public: false,
-  file: {} as File,
+  files: [] as File[],
 };
 
 function validatePhrase(value: string) {
   let error;
   if (!value) {
     error = "You should enter the transfer phrase";
-  }
-  return error;
-}
-
-function validateFile(value: File) {
-  let error;
-  if (!value?.name) {
-    error = "You should upload a file.";
   }
   return error;
 }
@@ -50,7 +42,6 @@ const durationOptions: durationOption[] = [
 
 function NewTransfer() {
   const history = useHistory();
-  const [submitErr, setSubmitErr] = useState(false);
   const [errMsg, setErrMsg] = useState("");
   return (
     <>
@@ -64,22 +55,21 @@ function NewTransfer() {
         <Formik
           initialValues={initialValues}
           onSubmit={async (values: NewTransferForm, actions) => {
-            const transferResponse = await POST_NewTransfer(values);
-            if (transferResponse.ok) {
-              const newTransferResBody: TransferResponse =
-                await transferResponse.json();
-              const filesResponse = await POST_SaveFiles(
-                values.file,
-                newTransferResBody.new_id
+            const transferRes = await POST_NewTransfer(values);
+            if (transferRes.ok) {
+              const newTransResBody: TransferResponse =
+                await transferRes.json();
+              const filesTransfered = await POST_SaveFiles(
+                values.files,
+                newTransResBody.new_id
               );
-              if (filesResponse.ok) {
+              if (filesTransfered) {
                 history.push(SITE_PATHS.HOME);
               } else {
-                const filesResBody: ResponseBody = await filesResponse.json();
-                setErrMsg(filesResBody.message);
+                setErrMsg("Hubo un error al guardar los archivos.");
               }
             } else {
-              const body: ResponseBody = await transferResponse.json();
+              const body: ResponseBody = await transferRes.json();
               setErrMsg(body.message);
             }
           }}
@@ -117,11 +107,18 @@ function NewTransfer() {
                     The public question will be asked.
                   </Text>
                 </Box>
-                <InputField
-                  name="file"
-                  inputType="file-upload"
-                  label="Add a file to your transfer."
-                  validate={validateFile}
+                <Input
+                  pl={0}
+                  onChange={(e) => {
+                    if (e.currentTarget.files) {
+                      const newFiles = values.files;
+                      newFiles.push(...Array.from(e.currentTarget.files));
+                      setFieldValue("files", newFiles);
+                    }
+                  }}
+                  type="file"
+                  accept=".pdf, .docx, .jpg, .jpeg, .png"
+                  multiple
                 />
                 {errMsg && (
                   <Alert status="error" textAlign="center">
