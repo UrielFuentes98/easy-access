@@ -3,12 +3,16 @@ export interface responseBody {
   message: string;
 }
 
-export interface PostTransferResponse extends responseBody {
+export interface PostTransferRes extends responseBody {
   new_id?: number;
 }
 
-export interface GetTransferResponse extends responseBody {
+export interface GetTransferRes extends responseBody {
   tempFileName?: string;
+}
+
+export interface GetFilesNamesRes extends responseBody {
+  filesNames?: string[];
 }
 
 export interface questionReturnInfo {
@@ -16,15 +20,15 @@ export interface questionReturnInfo {
   value: string;
 }
 
-export interface questionsResponse extends responseBody {
+export interface questionsRes extends responseBody {
   data?: questionReturnInfo[];
 }
 
-export interface getQuestionResponse extends responseBody {
+export interface getQuestionRes extends responseBody {
   question?: string;
   transfer_id?: number;
 }
 
-export interface valAnswerResponse extends responseBody {
+export interface valAnswerRes extends responseBody {
   tran_access_id?: string;
 }

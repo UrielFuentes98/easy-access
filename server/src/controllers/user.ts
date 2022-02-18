@@ -1,5 +1,5 @@
 import { wrap } from "@mikro-orm/core";
-import { questionReturnInfo, questionsResponse } from "../utils/interfaces";
+import { questionReturnInfo, questionsRes } from "../utils/interfaces";
 import { GET_QUESTIONS, RES_MESSAGES } from "../constants";
 import { Question } from "../entities";
 import { DI } from "../index";
@@ -44,7 +44,7 @@ export async function saveUserInfo(
   }
 }
 
-export async function getQuestions(): Promise<questionsResponse> {
+export async function getQuestions(): Promise<questionsRes> {
   try {
     const questions = await DI.questionRepository.findAll();
     const questionsReturnInfo = getQuestionsReturnInfo(questions);

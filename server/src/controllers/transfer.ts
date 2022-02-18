@@ -7,8 +7,9 @@ import {
 } from "@aws-sdk/client-s3";
 import { Transfer } from "../entities/";
 import {
+  GET_FILES_NAMES,
   GET_QUESTION,
-  GET_TRANSFER,
+  GET_FILE,
   POST_TRANSFER,
   RES_MESSAGES,
   VAL_ANSWER,
@@ -17,11 +18,12 @@ import { DI } from "../index";
 import { v4 as uuidv4 } from "uuid";
 import fs from "fs";
 import {
-  getQuestionResponse,
-  GetTransferResponse,
-  PostTransferResponse,
+  getQuestionRes,
+  GetTransferRes,
+  GetFilesNamesRes,
+  PostTransferRes,
   responseBody,
-  valAnswerResponse,
+  valAnswerRes,
 } from "../utils/interfaces";
 import { Readable } from "stream";
 import { saveFileLocally } from "./utils";
@@ -35,7 +37,7 @@ export interface NewTransfer {
 export async function saveNewTransfer(
   newTranVals: NewTransfer,
   reqUser: Express.User
-): Promise<PostTransferResponse> {
+): Promise<PostTransferRes> {
   try {
     const transfersWithPhrase = await DI.transferRepository.find({
       phrase: newTranVals.phrase,
@@ -173,42 +175,68 @@ async function deleteTransfer(tranId: number) {
   }
 }
 
-export async function getTransferFile(
-  tranId: number,
+export async function validTransferAccess(
+  transId: number,
   accessCode: string
-): Promise<GetTransferResponse> {
+): Promise<boolean> {
+  const transferMatched = await DI.transferRepository.findOne({
+    id: transId,
+    access_id: accessCode,
+  });
+  return transferMatched ? true : false;
+}
+export async function getTransferFilesNames(
+  transId: number
+): Promise<GetFilesNamesRes> {
+  const files = await DI.fileRepository.find({ file_transfer: transId });
+  if (files.length > 0) {
+    const filesNames: string[] = files.map((file) => file.name);
+    return {
+      key: GET_FILES_NAMES.SUCCESS,
+      message: RES_MESSAGES[GET_FILES_NAMES.SUCCESS],
+      filesNames: filesNames,
+    };
+  }
+  return {
+    key: GET_FILES_NAMES.INTERNAL_ERROR,
+    message: RES_MESSAGES[GET_FILES_NAMES.INTERNAL_ERROR],
+  };
+}
+
+export async function getTransferFile(
+  transId: number,
+  fileName: string
+): Promise<GetTransferRes> {
   try {
-    const foundTranfer = await DI.transferRepository.findOne({
-      id: tranId,
-      access_id: accessCode,
+    const transferFile = await DI.fileRepository.findOne({
+      file_transfer: transId,
+      name: fileName,
     });
-    if (foundTranfer) {
-      const transferFile = await DI.fileRepository.findOne({
-        file_transfer: foundTranfer.id,
-      });
-      if (transferFile) {
-        const objectKey = `transfer_${transferFile.file_transfer.id}/${transferFile.name}`;
-        const result = await fetchFile(objectKey);
-        if (result.Body instanceof Readable) {
-          const fileName = `tran-${transferFile.file_transfer.id}_${transferFile.name}`;
-          await saveFileLocally(result.Body, fileName);
-          return {
-            key: GET_TRANSFER.SUCCESS,
-            message: RES_MESSAGES[GET_TRANSFER.SUCCESS],
-            tempFileName: fileName,
-          };
-        }
+    if (transferFile) {
+      const objectKey = `transfer_${transferFile.file_transfer.id}/${transferFile.name}`;
+      const result = await fetchFile(objectKey);
+      if (result.Body instanceof Readable) {
+        const fileName = `tran-${transferFile.file_transfer.id}_${transferFile.name}`;
+        await saveFileLocally(result.Body, fileName);
+        DI.logger.debug(
+          `$File: ${transferFile.name}, fetched for transfer: ${transId}.`
+        );
+        return {
+          key: GET_FILE.SUCCESS,
+          message: RES_MESSAGES[GET_FILE.SUCCESS],
+          tempFileName: fileName,
+        };
       }
     }
     return {
-      key: GET_TRANSFER.ERROR,
-      message: RES_MESSAGES[GET_TRANSFER.ERROR],
+      key: GET_FILE.ERROR,
+      message: RES_MESSAGES[GET_FILE.ERROR],
     };
   } catch (err) {
     DI.logger.error(`Error while getting file.\n ${err}`);
     return {
-      key: GET_TRANSFER.ERROR,
-      message: RES_MESSAGES[GET_TRANSFER.ERROR],
+      key: GET_FILE.ERROR,
+      message: RES_MESSAGES[GET_FILE.ERROR],
     };
   }
 }
@@ -226,7 +254,7 @@ async function fetchFile(objectKey: string): Promise<GetObjectCommandOutput> {
 
 export async function getQuestionFromPhrase(
   phrase: string
-): Promise<getQuestionResponse> {
+): Promise<getQuestionRes> {
   try {
     const foundTransfersWithPhrase = await DI.transferRepository.find({
       phrase: phrase,
@@ -284,7 +312,7 @@ async function getQuestionFromTransfer(transfer: Transfer): Promise<string> {
 export async function validateQuestionAnswer(
   transferId: number,
   answer: string
-): Promise<valAnswerResponse> {
+): Promise<valAnswerRes> {
   let validAnswer: boolean = false;
   const transfer = await DI.transferRepository.findOne({ id: transferId }, [
     "owner",
@@ -301,19 +329,19 @@ export async function validateQuestionAnswer(
         key: VAL_ANSWER.SUCCESS,
         message: RES_MESSAGES[VAL_ANSWER.SUCCESS],
         tran_access_id: transfer.access_id,
-      } as valAnswerResponse;
+      } as valAnswerRes;
     } else {
       DI.logger.debug(`Wrong answer provided for transfer: ${transfer.id}`);
       return {
         key: VAL_ANSWER.ERROR,
         message: RES_MESSAGES[VAL_ANSWER.ERROR],
-      } as valAnswerResponse;
+      } as valAnswerRes;
     }
   } else {
     DI.logger.error(`Transfer: ${transferId}, wasnt found.`);
     return {
       key: VAL_ANSWER.NOT_FOUND,
       message: RES_MESSAGES[VAL_ANSWER.NOT_FOUND],
-    } as valAnswerResponse;
+    } as valAnswerRes;
   }
 }

@@ -9,7 +9,8 @@ import {
 import { StatusCodes } from "http-status-codes";
 import {
   BAD_REQ_RES,
-  GET_TRANSFER,
+  GET_FILES_NAMES,
+  GET_FILE,
   POST_TRANSFER as POST_TRANSFER,
   REQ_USER,
   RES_MESSAGES,
@@ -17,7 +18,9 @@ import {
 import { responseBody } from "../utils/interfaces";
 import {
   getTransferFile,
+  getTransferFilesNames,
   validateQuestionAnswer,
+  validTransferAccess as validateTransferAccess,
 } from "../controllers/transfer";
 import { changeFilePath } from "../controllers/utils";
 import { DI } from "../";
@@ -62,20 +65,55 @@ router.post("/files", upload.single("File"), async (req, res) => {
   }
 });
 
-router.get("/", async (req, res) => {
+router.get("/files-names", async (req, res) => {
   const transferId = parseInt(req.query.transId as string);
   const accessCode = req.query.accessId as string;
-  const response = await getTransferFile(transferId, accessCode);
-  if (response.key == GET_TRANSFER.SUCCESS) {
-    const newFilePath = changeFilePath(response.tempFileName!);
-    res.status(StatusCodes.OK).sendFile(newFilePath, (err) => {
-      if (err) DI.logger.error(`Error while sending response file.\n${err}`);
-      else {
-        fs.unlinkSync(newFilePath);
-      }
-    });
+  const validAccess = await validateTransferAccess(transferId, accessCode);
+  if (validAccess) {
+    DI.logger.debug(`Valid access to transfer: ${transferId}`);
+    const response = await getTransferFilesNames(transferId);
+    if (response.key == GET_FILES_NAMES.SUCCESS) {
+      DI.logger.debug(
+        `${response.filesNames?.length} files found for transfer: ${transferId}`
+      );
+      res.status(StatusCodes.OK).json(response);
+    } else {
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(response);
+    }
   } else {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(response);
+    const response: responseBody = {
+      key: GET_FILES_NAMES.ACCESS_ERROR,
+      message: RES_MESSAGES[GET_FILES_NAMES.ACCESS_ERROR],
+    };
+    res.status(StatusCodes.BAD_REQUEST).json(response);
+  }
+});
+
+router.get("/file", async (req, res) => {
+  const transferId = parseInt(req.query.transId as string);
+  const accessCode = req.query.accessId as string;
+  const fileName = req.query.fileName as string;
+  const validAccess = await validateTransferAccess(transferId, accessCode);
+
+  if (validAccess) {
+    const response = await getTransferFile(transferId, fileName);
+    if (response.key == GET_FILE.SUCCESS) {
+      const newFilePath = changeFilePath(response.tempFileName!);
+      res.status(StatusCodes.OK).download(newFilePath, (err) => {
+        if (err) DI.logger.error(`Error while sending response file.\n${err}`);
+        else {
+          fs.unlinkSync(newFilePath);
+        }
+      });
+    } else {
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(response);
+    }
+  } else {
+    const response: responseBody = {
+      key: GET_FILE.ACCESS_ERROR,
+      message: RES_MESSAGES[GET_FILE.ACCESS_ERROR],
+    };
+    res.status(StatusCodes.BAD_REQUEST).json(response);
   }
 });
 

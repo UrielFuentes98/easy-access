@@ -39,9 +39,16 @@ export enum POST_TRANSFER {
   ERROR = 402,
 }
 
-export enum GET_TRANSFER {
+export enum GET_FILE {
   SUCCESS = 40,
   ERROR = 500,
+  ACCESS_ERROR = 501,
+}
+
+export enum GET_FILES_NAMES {
+  SUCCESS = 40,
+  INTERNAL_ERROR = 600,
+  ACCESS_ERROR = 501,
 }
 
 const BAD_REQ_KEY = 400;
@@ -54,8 +61,14 @@ RES_MESSAGES[POST_TRANSFER.ERROR] =
 RES_MESSAGES[POST_TRANSFER.EXISTED] =
   "Transfer couldn't be saved because a transfer with that phrase is active.";
 
-RES_MESSAGES[GET_TRANSFER.SUCCESS] = "Transfer found.";
-RES_MESSAGES[GET_TRANSFER.ERROR] = "There was a problem getting the transfer.";
+RES_MESSAGES[GET_FILES_NAMES.SUCCESS] = "Files names found.";
+RES_MESSAGES[GET_FILES_NAMES.INTERNAL_ERROR] =
+  "There was a problem finding the transfer files names.";
+RES_MESSAGES[GET_FILES_NAMES.ACCESS_ERROR] =
+  "No transfer could be accessed with the data provided.";
+
+RES_MESSAGES[GET_FILE.SUCCESS] = "File fetched successfully.";
+RES_MESSAGES[GET_FILE.ERROR] = "There was a problem getting the file.";
 
 RES_MESSAGES[REQ_USER.NOT_LOGGED_IN] = "You're not logged in.";
 RES_MESSAGES[POST_TRANSFER.FILE_SUCCESS] = "File saved.";
