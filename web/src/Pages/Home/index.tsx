@@ -14,15 +14,21 @@ import {
   Td,
 } from "@chakra-ui/react";
 import { SITE_PATHS } from "app/routes";
-import { useEffect } from "react";
+import { GET_ActiveTransfers } from "app/utils/api";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 function HomePage() {
+  const [transferPhrases, setTransferPhrases] = useState([] as string[]);
   useEffect(() => {
-    async function fetchUserData() {
-      //alert(JSON.stringify(userMetadata, null, 2));
+    async function fetchActiveTransfers() {
+      const response = await GET_ActiveTransfers();
+      if (response.ok) {
+        const activeTransfers: string[] = await response.json();
+        setTransferPhrases([...activeTransfers]);
+      }
     }
-    fetchUserData();
+    fetchActiveTransfers();
   }, []);
   return (
     <>
@@ -50,33 +56,37 @@ function HomePage() {
           </Button>
         </VStack>
       </Box>
-      <Table
-        variant="simple"
-        size="lg"
-        alignSelf="center"
-        width="xs"
-        colorScheme="blue"
-      >
-        <Thead>
-          <Tr>
-            <Th>Transfer</Th>
-            <Th width={8}></Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          <Tr>
-            <Td>Test</Td>
-            <Td textAlign="center">
-              <CloseIcon
-                alignContent="center"
-                width={3}
-                color="red.600"
-                _hover={{ cursor: "pointer" }}
-              />
-            </Td>
-          </Tr>
-        </Tbody>
-      </Table>
+      {transferPhrases.length > 0 && (
+        <Table
+          variant="simple"
+          size="lg"
+          alignSelf="center"
+          width="xs"
+          colorScheme="blue"
+        >
+          <Thead>
+            <Tr>
+              <Th>Transfers</Th>
+              <Th width={8}></Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {transferPhrases.map((phrase) => (
+              <Tr>
+                <Td>{phrase}</Td>
+                <Td textAlign="center">
+                  <CloseIcon
+                    alignContent="center"
+                    width={3}
+                    color="red.600"
+                    _hover={{ cursor: "pointer" }}
+                  />
+                </Td>
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      )}
       <Alert status="success" rounded={10} alignSelf="center" width={80}>
         <AlertIcon />
         Data uploaded to the server. Fire on!

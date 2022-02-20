@@ -34,6 +34,23 @@ export interface NewTransfer {
   is_public: boolean;
 }
 
+export async function getActiveTranfers(
+  reqUser: Express.User
+): Promise<string[]> {
+  let transferPhrases: string[] = [];
+  const registeredUser = await DI.userRepository.findOne({
+    issuer: reqUser.issuer,
+  });
+  if (registeredUser) {
+    const transfersOfUser = await DI.transferRepository.find({
+      owner: registeredUser.id,
+    });
+    const activeTransfers = filterActiveTranfers(transfersOfUser);
+    transferPhrases = activeTransfers.map((transfer) => transfer.phrase);
+  }
+  return transferPhrases;
+}
+
 export async function saveNewTransfer(
   newTranVals: NewTransfer,
   reqUser: Express.User
@@ -175,7 +192,7 @@ async function deleteTransfer(tranId: number) {
   }
 }
 
-export async function validTransferAccess(
+export async function validateTransferAccess(
   transId: number,
   accessCode: string
 ): Promise<boolean> {

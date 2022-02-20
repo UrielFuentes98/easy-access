@@ -17,10 +17,11 @@ import {
 } from "../constants";
 import { responseBody } from "../utils/interfaces";
 import {
+  getActiveTranfers,
   getTransferFile,
   getTransferFilesNames,
   validateQuestionAnswer,
-  validTransferAccess as validateTransferAccess,
+  validateTransferAccess,
 } from "../controllers/transfer";
 import { changeFilePath } from "../controllers/utils";
 import { DI } from "../";
@@ -131,6 +132,19 @@ router.get("/valAnswer", async (req, res) => {
     res.status(StatusCodes.OK).json(response);
   } else {
     res.status(StatusCodes.BAD_REQUEST).json(BAD_REQ_RES);
+  }
+});
+
+router.get("/active-transfers", async (req, res) => {
+  if (req.isAuthenticated()) {
+    const transferPhrases: string[] = await getActiveTranfers(req.user);
+    return res.status(StatusCodes.OK).send(transferPhrases);
+  } else {
+    const responseObj: responseBody = {
+      key: REQ_USER.NOT_LOGGED_IN,
+      message: RES_MESSAGES[REQ_USER.NOT_LOGGED_IN],
+    };
+    return res.status(StatusCodes.BAD_REQUEST).json(responseObj);
   }
 });
 

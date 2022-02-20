@@ -65,3 +65,8 @@ export async function GET_FilesNames(transferId: number, accessId: string) {
   );
   return response;
 }
+
+export async function GET_ActiveTransfers() {
+  const response = await fetch(`/transfer/active-transfers`);
+  return response;
+}
