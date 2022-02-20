@@ -30,7 +30,7 @@ function getTransferSendData(
   const durationNum = parseInt(newTransFormVals.duration);
 
   const sendTransferVals: NewTranSendVals = {
-    ...newTransFormVals,
+    is_public: newTransFormVals.is_public,
     phrase: newTransFormVals.phrase.trim(),
     duration: durationNum,
   };

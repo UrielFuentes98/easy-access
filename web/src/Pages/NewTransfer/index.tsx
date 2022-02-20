@@ -11,19 +11,18 @@ import {
 import { useHistory } from "react-router-dom";
 import { POST_SaveFiles } from "app/utils/api";
 import { SITE_PATHS } from "app/routes";
+import { CloseIcon } from "@chakra-ui/icons";
 
 export interface NewTransferForm {
   phrase: string;
   duration: string;
   is_public: boolean;
-  files: File[];
 }
 
 const initialValues: NewTransferForm = {
   phrase: "",
   duration: "15",
   is_public: false,
-  files: [] as File[],
 };
 
 function validatePhrase(value: string) {
@@ -43,6 +42,8 @@ const durationOptions: durationOption[] = [
 function NewTransfer() {
   const history = useHistory();
   const [errMsg, setErrMsg] = useState("");
+  const [files, setFiles] = useState([] as File[]);
+
   return (
     <>
       <Box
@@ -54,13 +55,13 @@ function NewTransfer() {
       >
         <Formik
           initialValues={initialValues}
-          onSubmit={async (values: NewTransferForm, actions) => {
+          onSubmit={async (values: NewTransferForm) => {
             const transferRes = await POST_NewTransfer(values);
             if (transferRes.ok) {
               const newTransResBody: TransferResponse =
                 await transferRes.json();
               const filesTransfered = await POST_SaveFiles(
-                values.files,
+                files,
                 newTransResBody.new_id
               );
               if (filesTransfered) {
@@ -111,15 +112,47 @@ function NewTransfer() {
                   pl={0}
                   onChange={(e) => {
                     if (e.currentTarget.files) {
-                      const newFiles = values.files;
-                      newFiles.push(...Array.from(e.currentTarget.files));
-                      setFieldValue("files", newFiles);
+                      const uploadedFiles = Array.from(e.currentTarget.files);
+                      const newFiles = files;
+                      newFiles.push(...uploadedFiles);
+                      setFiles([...newFiles]);
                     }
                   }}
                   type="file"
                   accept=".pdf, .docx, .jpg, .jpeg, .png"
                   multiple
                 />
+                <Box>
+                  {files.map((file, key) => (
+                    <Box
+                      display="flex"
+                      alignItems="center"
+                      key={key}
+                      width={[100, null, 130]}
+                      justifyContent="space-between"
+                    >
+                      <Text fontSize={["md", null, "xl"]}>{file.name}</Text>
+                      <CloseIcon
+                        color="red.600"
+                        boxSize={3}
+                        _hover={{ cursor: "pointer" }}
+                        id={file.name}
+                        onClick={(e) => {
+                          const fileName = e.currentTarget.id;
+                          const fileToRemove = files.find(
+                            (file) => file.name === fileName
+                          );
+                          if (fileToRemove) {
+                            const newFiles = files;
+                            const indexOfFile = newFiles.indexOf(fileToRemove);
+                            newFiles.splice(indexOfFile, 1);
+                            setFiles([...newFiles]);
+                          }
+                        }}
+                      />
+                    </Box>
+                  ))}
+                </Box>
                 {errMsg && (
                   <Alert status="error" textAlign="center">
                     {errMsg}

@@ -145,7 +145,7 @@ async function saveFileToS3(
   try {
     const command = new PutObjectCommand(params);
     await DI.S3Client.send(command);
-    DI.logger.debug("File successfully uploaded.");
+    DI.logger.debug(`File successfully uploaded. Key name: ${objectKey}`);
   } catch (err) {
     DI.logger.error("Error occured while trying to upload to S3 bucket", err);
     return false;

@@ -48,7 +48,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.post("/files", upload.single("File"), async (req, res) => {
+router.post("/file", upload.single("File"), async (req, res) => {
   if (req.isAuthenticated()) {
     const response = await saveTransferFiles(req.file!, req.body.tranId);
     if (response.key === POST_TRANSFER.FILE_SUCCESS) {
