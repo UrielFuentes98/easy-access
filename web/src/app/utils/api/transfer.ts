@@ -67,6 +67,13 @@ export async function GET_FilesNames(transferId: number, accessId: string) {
 }
 
 export async function GET_ActiveTransfers() {
-  const response = await fetch(`/transfer/active-transfers`);
+  const response = await fetch(`/transfer/actives`);
+  return response;
+}
+
+export async function POST_DeactivateTransfer(phrase: string) {
+  const response = await fetch(`/transfer/de-activate?phrase=${phrase}`, {
+    method: "POST",
+  });
   return response;
 }

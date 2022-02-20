@@ -13,6 +13,7 @@ import {
   POST_TRANSFER,
   RES_MESSAGES,
   VAL_ANSWER,
+  POST_DEACTIVATE,
 } from "../constants";
 import { DI } from "../index";
 import { v4 as uuidv4 } from "uuid";
@@ -44,11 +45,42 @@ export async function getActiveTranfers(
   if (registeredUser) {
     const transfersOfUser = await DI.transferRepository.find({
       owner: registeredUser.id,
+      is_de_activated: false,
     });
     const activeTransfers = filterActiveTranfers(transfersOfUser);
     transferPhrases = activeTransfers.map((transfer) => transfer.phrase);
   }
   return transferPhrases;
+}
+
+export async function deActivateTranfer(
+  reqUser: Express.User,
+  transferPhrase: string
+) {
+  const registeredUser = await DI.userRepository.findOne({
+    issuer: reqUser.issuer,
+  });
+  if (registeredUser) {
+    const transfersWithPhrase = await DI.transferRepository.find({
+      phrase: transferPhrase,
+      owner: registeredUser.id,
+      is_de_activated: false,
+    });
+    const activeTransfer = filterActiveTranfers(transfersWithPhrase);
+    if (activeTransfer.length == 1) {
+      activeTransfer[0].is_de_activated = true;
+      await DI.transferRepository.persistAndFlush(activeTransfer[0]);
+      DI.logger.debug(`Transfer: ${activeTransfer[0].id} deactivated.`);
+      return {
+        key: POST_DEACTIVATE.SUCCESS,
+        message: RES_MESSAGES[POST_DEACTIVATE.SUCCESS],
+      } as responseBody;
+    }
+  }
+  return {
+    key: POST_DEACTIVATE.ERROR,
+    message: RES_MESSAGES[POST_DEACTIVATE.ERROR],
+  } as responseBody;
 }
 
 export async function saveNewTransfer(
@@ -58,6 +90,7 @@ export async function saveNewTransfer(
   try {
     const transfersWithPhrase = await DI.transferRepository.find({
       phrase: newTranVals.phrase,
+      is_de_activated: false,
     });
     if (existsActiveTransfer(transfersWithPhrase) == false) {
       const registeredUser = await DI.userRepository.findOne({
@@ -275,6 +308,7 @@ export async function getQuestionFromPhrase(
   try {
     const foundTransfersWithPhrase = await DI.transferRepository.find({
       phrase: phrase,
+      is_de_activated: false,
     });
     const activeTransfers = filterActiveTranfers(foundTransfersWithPhrase);
     if (activeTransfers.length > 0) {

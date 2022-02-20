@@ -14,6 +14,7 @@ import {
   POST_TRANSFER as POST_TRANSFER,
   REQ_USER,
   RES_MESSAGES,
+  POST_DEACTIVATE,
 } from "../constants";
 import { responseBody } from "../utils/interfaces";
 import {
@@ -22,6 +23,7 @@ import {
   getTransferFilesNames,
   validateQuestionAnswer,
   validateTransferAccess,
+  deActivateTranfer,
 } from "../controllers/transfer";
 import { changeFilePath } from "../controllers/utils";
 import { DI } from "../";
@@ -63,6 +65,27 @@ router.post("/file", upload.single("File"), async (req, res) => {
       message: RES_MESSAGES[REQ_USER.NOT_LOGGED_IN],
     };
     return res.status(StatusCodes.BAD_REQUEST).json(responseObj);
+  }
+});
+
+router.post("/de-activate", async (req, res) => {
+  if (req.isAuthenticated()) {
+    const transferPhrase = req.query.phrase as string;
+    const response: responseBody = await deActivateTranfer(
+      req.user,
+      transferPhrase
+    );
+    if (response.key == POST_DEACTIVATE.SUCCESS) {
+      res.status(StatusCodes.OK).json(response);
+    } else {
+      res.status(StatusCodes.BAD_REQUEST).json(response);
+    }
+  } else {
+    const responseObj: responseBody = {
+      key: REQ_USER.NOT_LOGGED_IN,
+      message: RES_MESSAGES[REQ_USER.NOT_LOGGED_IN],
+    };
+    res.status(StatusCodes.BAD_REQUEST).json(responseObj);
   }
 });
 
@@ -124,7 +147,7 @@ router.get("/question", async (req, res) => {
   res.status(StatusCodes.OK).json(response);
 });
 
-router.get("/valAnswer", async (req, res) => {
+router.get("/validate-answer", async (req, res) => {
   const queryAnswer = req.query.answer as string;
   const queryTranId = parseInt(req.query.transferId as string);
   if (queryAnswer && queryTranId) {
@@ -135,7 +158,7 @@ router.get("/valAnswer", async (req, res) => {
   }
 });
 
-router.get("/active-transfers", async (req, res) => {
+router.get("/actives", async (req, res) => {
   if (req.isAuthenticated()) {
     const transferPhrases: string[] = await getActiveTranfers(req.user);
     return res.status(StatusCodes.OK).send(transferPhrases);

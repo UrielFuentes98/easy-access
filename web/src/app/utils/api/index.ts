@@ -5,6 +5,7 @@ export {
   POST_SaveFiles,
   GET_FilesNames,
   GET_ActiveTransfers,
+  POST_DeactivateTransfer,
 } from "./transfer";
 export { GET_SecretQuestions, POST_UserInfo, POST_LogoutUser } from "./user";
 

@@ -29,6 +29,9 @@ export class Transfer {
   @Property()
   is_public!: boolean;
 
+  @Property()
+  is_de_activated: boolean = false;
+
   @OneToMany(() => File, (file) => file.file_transfer)
   transfer_files = new Collection<File>(this);
 

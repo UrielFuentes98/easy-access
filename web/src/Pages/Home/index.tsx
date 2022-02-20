@@ -14,7 +14,7 @@ import {
   Td,
 } from "@chakra-ui/react";
 import { SITE_PATHS } from "app/routes";
-import { GET_ActiveTransfers } from "app/utils/api";
+import { GET_ActiveTransfers, POST_DeactivateTransfer } from "app/utils/api";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -80,6 +80,21 @@ function HomePage() {
                     width={3}
                     color="red.600"
                     _hover={{ cursor: "pointer" }}
+                    id={phrase}
+                    onClick={async (e) => {
+                      const transferPhrase = e.currentTarget.id;
+                      const reponse = await POST_DeactivateTransfer(
+                        transferPhrase
+                      );
+                      if (reponse.ok) {
+                        const index = transferPhrases.indexOf(transferPhrase);
+                        if (index > -1) {
+                          let newPhrases = transferPhrases;
+                          newPhrases.splice(index, 1);
+                          setTransferPhrases([...newPhrases]);
+                        }
+                      }
+                    }}
                   />
                 </Td>
               </Tr>

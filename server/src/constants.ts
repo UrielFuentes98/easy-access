@@ -51,6 +51,11 @@ export enum GET_FILES_NAMES {
   ACCESS_ERROR = 501,
 }
 
+export enum POST_DEACTIVATE {
+  SUCCESS = 50,
+  ERROR = 700,
+}
+
 const BAD_REQ_KEY = 400;
 
 let RES_MESSAGES = {} as any;
@@ -60,6 +65,9 @@ RES_MESSAGES[POST_TRANSFER.ERROR] =
   "Transfer couldn't be saved. Please try again.";
 RES_MESSAGES[POST_TRANSFER.EXISTED] =
   "Transfer couldn't be saved because a transfer with that phrase is active.";
+
+RES_MESSAGES[POST_DEACTIVATE.SUCCESS] = "Transfer deactivated";
+RES_MESSAGES[POST_DEACTIVATE.ERROR] = "Transfer couldn't be deactivated";
 
 RES_MESSAGES[GET_FILES_NAMES.SUCCESS] = "Files names found.";
 RES_MESSAGES[GET_FILES_NAMES.INTERNAL_ERROR] =
