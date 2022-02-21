@@ -25,6 +25,7 @@ import {
   PostTransferRes,
   responseBody,
   valAnswerRes,
+  TransferData,
 } from "../utils/interfaces";
 import { Readable } from "stream";
 import { saveFileLocally } from "./utils";
@@ -37,8 +38,8 @@ export interface NewTransfer {
 
 export async function getActiveTranfers(
   reqUser: Express.User
-): Promise<string[]> {
-  let transferPhrases: string[] = [];
+): Promise<TransferData[]> {
+  let transfersData: TransferData[] = [];
   const registeredUser = await DI.userRepository.findOne({
     issuer: reqUser.issuer,
   });
@@ -48,9 +49,18 @@ export async function getActiveTranfers(
       is_de_activated: false,
     });
     const activeTransfers = filterActiveTranfers(transfersOfUser);
-    transferPhrases = activeTransfers.map((transfer) => transfer.phrase);
+    transfersData = activeTransfers.map((transfer) => {
+      const seconds = getReaminingSecs(transfer);
+      return { phrase: transfer.phrase, secs_remaining: seconds };
+    });
   }
-  return transferPhrases;
+  return transfersData;
+}
+
+export function getReaminingSecs(transfer: Transfer): number {
+  const diffTime = Math.abs(Date.now() - transfer.createdAt.getTime());
+  const diffSeconds = Math.ceil(diffTime / 1000);
+  return transfer.duration * 60 - diffSeconds;
 }
 
 export async function deActivateTranfer(

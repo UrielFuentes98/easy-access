@@ -32,3 +32,8 @@ export interface getQuestionRes extends responseBody {
 export interface valAnswerRes extends responseBody {
   tran_access_id?: string;
 }
+
+export interface TransferData {
+  phrase: string;
+  secs_remaining: number;
+}

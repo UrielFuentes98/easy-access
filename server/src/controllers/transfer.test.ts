@@ -1,6 +1,6 @@
 import assert from "assert";
 import { Transfer } from "../entities";
-import { existsActiveTransfer } from "./transfer";
+import { existsActiveTransfer, getReaminingSecs } from "./transfer";
 
 describe("Transfer controller", function () {
   describe("Active transfers time tests", function () {
@@ -59,6 +59,27 @@ describe("Transfer controller", function () {
       const transfersInMemory = [transfer1, transfer2];
 
       assert.equal(existsActiveTransfer(transfersInMemory), true);
+    });
+  });
+
+  describe("Seconds remaining tests", function () {
+    it("should return 600 seconds.", function () {
+      const transferDate = new Date();
+      transferDate.setMinutes(transferDate.getMinutes() - 10);
+      const transfer = new Transfer();
+      transfer.createdAt = transferDate;
+      transfer.duration = 20;
+
+      assert.equal(getReaminingSecs(transfer), 600);
+    });
+    it("should return 300 seconds.", function () {
+      const transferDate = new Date();
+      transferDate.setMinutes(transferDate.getMinutes() - 40);
+      const transfer = new Transfer();
+      transfer.createdAt = transferDate;
+      transfer.duration = 45;
+
+      assert.equal(getReaminingSecs(transfer), 300);
     });
   });
 });

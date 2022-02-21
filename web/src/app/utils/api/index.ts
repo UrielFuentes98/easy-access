@@ -24,6 +24,11 @@ export interface FilesNamesResponse extends ResponseBody {
   filesNames: string[];
 }
 
+export interface TransferStat {
+  phrase: string;
+  secs_remaining: number;
+}
+
 export enum GET_FILES_NAMES {
   SUCCESS = 40,
   INTERNAL_ERROR = 600,

@@ -16,7 +16,7 @@ import {
   RES_MESSAGES,
   POST_DEACTIVATE,
 } from "../constants";
-import { responseBody } from "../utils/interfaces";
+import { responseBody, TransferData } from "../utils/interfaces";
 import {
   getActiveTranfers,
   getTransferFile,
@@ -160,8 +160,8 @@ router.get("/validate-answer", async (req, res) => {
 
 router.get("/actives", async (req, res) => {
   if (req.isAuthenticated()) {
-    const transferPhrases: string[] = await getActiveTranfers(req.user);
-    return res.status(StatusCodes.OK).send(transferPhrases);
+    const transfersData: TransferData[] = await getActiveTranfers(req.user);
+    return res.status(StatusCodes.OK).json(transfersData);
   } else {
     const responseObj: responseBody = {
       key: REQ_USER.NOT_LOGGED_IN,

@@ -22,7 +22,11 @@ import {
 } from "@chakra-ui/react";
 import { useAppSelector } from "app/hooks";
 import { SITE_PATHS } from "app/routes";
-import { GET_ActiveTransfers, POST_DeactivateTransfer } from "app/utils/api";
+import {
+  GET_ActiveTransfers,
+  POST_DeactivateTransfer,
+  TransferStat,
+} from "app/utils/api";
 import {
   selectRecentTransfer,
   setRecentTransfer,
@@ -31,8 +35,26 @@ import {
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
+function getTimeFormat(seconds: number): string {
+  const intSecs = Math.floor(seconds % 60);
+  const intMins = Math.floor((seconds / 60) % 60);
+  const intHrs = Math.floor(seconds / (60 * 60));
+
+  const strHrs = intHrs.toLocaleString("en-US", {
+    minimumIntegerDigits: 2,
+  });
+  const strMins = intMins.toLocaleString("en-US", {
+    minimumIntegerDigits: 2,
+  });
+  const strSecs = intSecs.toLocaleString("en-US", {
+    minimumIntegerDigits: 2,
+  });
+
+  return `${strHrs}:${strMins}:${strSecs}`;
+}
+
 function HomePage() {
-  const [transferPhrases, setTransferPhrases] = useState([] as string[]);
+  const [transfersStats, setTransfersStats] = useState([] as TransferStat[]);
   const [showNewTransferAlert, setShowNewTransferAlert] = useState(false);
   const recentTransfer = useAppSelector(selectRecentTransfer);
   const newTransferPhrase = useAppSelector(selectNewTransferPhrase);
@@ -50,8 +72,8 @@ function HomePage() {
     async function fetchActiveTransfers() {
       const response = await GET_ActiveTransfers();
       if (response.ok) {
-        const activeTransfers: string[] = await response.json();
-        setTransferPhrases([...activeTransfers]);
+        const transfersStats: TransferStat[] = await response.json();
+        setTransfersStats([...transfersStats]);
       }
     }
     fetchActiveTransfers();
@@ -88,24 +110,26 @@ function HomePage() {
           New transfer created with phrase '{newTransferPhrase}'
         </Alert>
       )}
-      {transferPhrases.length > 0 && (
+      {transfersStats.length > 0 && (
         <Table
           variant="simple"
           size="lg"
           alignSelf="center"
-          width="xs"
+          width="2xs"
           colorScheme="blue"
         >
           <Thead>
             <Tr>
-              <Th>Transfers</Th>
+              <Th px={0}>Transfer</Th>
+              <Th>Time remaining hh:mm:ss</Th>
               <Th width={8}></Th>
             </Tr>
           </Thead>
           <Tbody>
-            {transferPhrases.map((phrase) => (
+            {transfersStats.map((transfer) => (
               <Tr>
-                <Td>{phrase}</Td>
+                <Td px={0}>{transfer.phrase}</Td>
+                <Td>{getTimeFormat(transfer.secs_remaining)}</Td>
                 <Td textAlign="center">
                   <Popover>
                     {({ onClose }) => (
@@ -127,19 +151,23 @@ function HomePage() {
                           <PopoverBody>
                             <Button
                               colorScheme="blue"
-                              id={phrase}
+                              id={transfer.phrase}
                               onClick={async (e) => {
                                 const transferPhrase = e.currentTarget.id;
                                 const reponse = await POST_DeactivateTransfer(
                                   transferPhrase
                                 );
                                 if (reponse.ok) {
-                                  const index =
-                                    transferPhrases.indexOf(transferPhrase);
-                                  if (index > -1) {
-                                    let newPhrases = transferPhrases;
-                                    newPhrases.splice(index, 1);
-                                    setTransferPhrases([...newPhrases]);
+                                  const transfer = transfersStats.find(
+                                    (transfer) =>
+                                      transfer.phrase === transferPhrase
+                                  );
+                                  if (transfer) {
+                                    const index =
+                                      transfersStats.indexOf(transfer);
+                                    let newStats = transfersStats;
+                                    newStats.splice(index, 1);
+                                    setTransfersStats([...newStats]);
                                   }
                                 }
                                 onClose();
