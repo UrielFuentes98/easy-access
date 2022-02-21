@@ -12,6 +12,13 @@ import {
   Th,
   Tbody,
   Td,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverArrow,
+  PopoverCloseButton,
+  PopoverHeader,
+  PopoverBody,
 } from "@chakra-ui/react";
 import { useAppSelector } from "app/hooks";
 import { SITE_PATHS } from "app/routes";
@@ -63,7 +70,7 @@ function HomePage() {
             Welcome!
           </Text>
           <Text fontSize={["md", null, "xl"]} textAlign="center">
-            Start a new transfer or access your active transfers.
+            Start a new transfer or check your active transfers.
           </Text>
           <Button
             fontSize={["md", null, "xl"]}
@@ -100,27 +107,51 @@ function HomePage() {
               <Tr>
                 <Td>{phrase}</Td>
                 <Td textAlign="center">
-                  <CloseIcon
-                    alignContent="center"
-                    width={3}
-                    color="red.600"
-                    _hover={{ cursor: "pointer" }}
-                    id={phrase}
-                    onClick={async (e) => {
-                      const transferPhrase = e.currentTarget.id;
-                      const reponse = await POST_DeactivateTransfer(
-                        transferPhrase
-                      );
-                      if (reponse.ok) {
-                        const index = transferPhrases.indexOf(transferPhrase);
-                        if (index > -1) {
-                          let newPhrases = transferPhrases;
-                          newPhrases.splice(index, 1);
-                          setTransferPhrases([...newPhrases]);
-                        }
-                      }
-                    }}
-                  />
+                  <Popover>
+                    {({ onClose }) => (
+                      <>
+                        <PopoverTrigger>
+                          <CloseIcon
+                            alignContent="center"
+                            width={3}
+                            color="red.600"
+                            _hover={{ cursor: "pointer" }}
+                          />
+                        </PopoverTrigger>
+                        <PopoverContent>
+                          <PopoverArrow />
+                          <PopoverCloseButton />
+                          <PopoverHeader>
+                            Are you sure you want to delete the transfer?
+                          </PopoverHeader>
+                          <PopoverBody>
+                            <Button
+                              colorScheme="blue"
+                              id={phrase}
+                              onClick={async (e) => {
+                                const transferPhrase = e.currentTarget.id;
+                                const reponse = await POST_DeactivateTransfer(
+                                  transferPhrase
+                                );
+                                if (reponse.ok) {
+                                  const index =
+                                    transferPhrases.indexOf(transferPhrase);
+                                  if (index > -1) {
+                                    let newPhrases = transferPhrases;
+                                    newPhrases.splice(index, 1);
+                                    setTransferPhrases([...newPhrases]);
+                                  }
+                                }
+                                onClose();
+                              }}
+                            >
+                              Yes
+                            </Button>
+                          </PopoverBody>
+                        </PopoverContent>
+                      </>
+                    )}
+                  </Popover>
                 </Td>
               </Tr>
             ))}
