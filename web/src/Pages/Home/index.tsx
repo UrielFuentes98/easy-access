@@ -13,13 +13,32 @@ import {
   Tbody,
   Td,
 } from "@chakra-ui/react";
+import { useAppSelector } from "app/hooks";
 import { SITE_PATHS } from "app/routes";
 import { GET_ActiveTransfers, POST_DeactivateTransfer } from "app/utils/api";
+import {
+  selectRecentTransfer,
+  setRecentTransfer,
+  selectNewTransferPhrase,
+} from "Pages/NewTransfer/newTransferSlice";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 function HomePage() {
   const [transferPhrases, setTransferPhrases] = useState([] as string[]);
+  const [showNewTransferAlert, setShowNewTransferAlert] = useState(false);
+  const recentTransfer = useAppSelector(selectRecentTransfer);
+  const newTransferPhrase = useAppSelector(selectNewTransferPhrase);
+
+  useEffect(() => {
+    if (recentTransfer) {
+      setRecentTransfer(false);
+      setShowNewTransferAlert(true);
+      const timer = setTimeout(() => setShowNewTransferAlert(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
   useEffect(() => {
     async function fetchActiveTransfers() {
       const response = await GET_ActiveTransfers();
@@ -56,6 +75,12 @@ function HomePage() {
           </Button>
         </VStack>
       </Box>
+      {showNewTransferAlert && (
+        <Alert status="success" rounded={10} alignSelf="center" width={80}>
+          <AlertIcon />
+          New transfer created with phrase '{newTransferPhrase}'
+        </Alert>
+      )}
       {transferPhrases.length > 0 && (
         <Table
           variant="simple"
@@ -102,10 +127,6 @@ function HomePage() {
           </Tbody>
         </Table>
       )}
-      <Alert status="success" rounded={10} alignSelf="center" width={80}>
-        <AlertIcon />
-        Data uploaded to the server. Fire on!
-      </Alert>
     </>
   );
 }

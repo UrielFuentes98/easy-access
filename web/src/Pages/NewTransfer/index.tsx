@@ -12,6 +12,8 @@ import { useHistory } from "react-router-dom";
 import { POST_SaveFiles } from "app/utils/api";
 import { SITE_PATHS } from "app/routes";
 import { CloseIcon } from "@chakra-ui/icons";
+import { setNewTransferPhrase, setRecentTransfer } from "./newTransferSlice";
+import { useAppDispatch } from "app/hooks";
 
 export interface NewTransferForm {
   phrase: string;
@@ -41,6 +43,7 @@ const durationOptions: durationOption[] = [
 
 function NewTransfer() {
   const history = useHistory();
+  const dispatch = useAppDispatch();
   const [errMsg, setErrMsg] = useState("");
   const [files, setFiles] = useState([] as File[]);
 
@@ -65,6 +68,8 @@ function NewTransfer() {
                 newTransResBody.new_id
               );
               if (filesTransfered) {
+                dispatch(setRecentTransfer(true));
+                dispatch(setNewTransferPhrase(values.phrase));
                 history.push(SITE_PATHS.HOME);
               } else {
                 setErrMsg("Hubo un error al guardar los archivos.");
