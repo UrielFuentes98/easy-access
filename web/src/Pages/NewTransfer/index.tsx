@@ -59,24 +59,30 @@ function NewTransfer() {
         <Formik
           initialValues={initialValues}
           onSubmit={async (values: NewTransferForm) => {
-            const transferRes = await POST_NewTransfer(values);
-            if (transferRes.ok) {
-              const newTransResBody: TransferResponse =
-                await transferRes.json();
-              const filesTransfered = await POST_SaveFiles(
-                files,
-                newTransResBody.new_id
-              );
-              if (filesTransfered) {
-                dispatch(setRecentTransfer(true));
-                dispatch(setNewTransferPhrase(values.phrase));
-                history.push(SITE_PATHS.HOME);
+            if (files.length > 0) {
+              const transferRes = await POST_NewTransfer(values);
+              if (transferRes.ok) {
+                const newTransResBody: TransferResponse =
+                  await transferRes.json();
+                const filesTransfered = await POST_SaveFiles(
+                  files,
+                  newTransResBody.new_id
+                );
+                if (filesTransfered) {
+                  dispatch(setRecentTransfer(true));
+                  dispatch(setNewTransferPhrase(values.phrase));
+                  history.push(SITE_PATHS.HOME);
+                } else {
+                  setErrMsg(
+                    "There was an error while saving the transfer files."
+                  );
+                }
               } else {
-                setErrMsg("Hubo un error al guardar los archivos.");
+                const body: ResponseBody = await transferRes.json();
+                setErrMsg(body.message);
               }
             } else {
-              const body: ResponseBody = await transferRes.json();
-              setErrMsg(body.message);
+              setErrMsg("You should add files to the transfer.");
             }
           }}
         >
@@ -121,6 +127,9 @@ function NewTransfer() {
                       const newFiles = files;
                       newFiles.push(...uploadedFiles);
                       setFiles([...newFiles]);
+                    }
+                    if (files.length > 0) {
+                      setErrMsg("");
                     }
                   }}
                   type="file"
