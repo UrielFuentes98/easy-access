@@ -11,9 +11,9 @@ import {
 import { useHistory } from "react-router-dom";
 import { POST_SaveFiles } from "app/utils/api";
 import { SITE_PATHS } from "app/routes";
-import { CloseIcon } from "@chakra-ui/icons";
 import { setNewTransferPhrase, setRecentTransfer } from "./newTransferSlice";
 import { useAppDispatch } from "app/hooks";
+import UploadedFiles from "./UploadedFiles";
 
 export interface NewTransferForm {
   phrase: string;
@@ -136,37 +136,7 @@ function NewTransfer() {
                   accept=".pdf, .docx, .jpg, .jpeg, .png"
                   multiple
                 />
-                <Box>
-                  {files.map((file, key) => (
-                    <Box
-                      display="flex"
-                      alignItems="center"
-                      key={key}
-                      width={[100, null, 130]}
-                      justifyContent="space-between"
-                    >
-                      <Text fontSize={["md", null, "xl"]}>{file.name}</Text>
-                      <CloseIcon
-                        color="red.600"
-                        boxSize={3}
-                        _hover={{ cursor: "pointer" }}
-                        id={file.name}
-                        onClick={(e) => {
-                          const fileName = e.currentTarget.id;
-                          const fileToRemove = files.find(
-                            (file) => file.name === fileName
-                          );
-                          if (fileToRemove) {
-                            const newFiles = files;
-                            const indexOfFile = newFiles.indexOf(fileToRemove);
-                            newFiles.splice(indexOfFile, 1);
-                            setFiles([...newFiles]);
-                          }
-                        }}
-                      />
-                    </Box>
-                  ))}
-                </Box>
+                <UploadedFiles {...{ files }} {...{ setFiles }} />
                 {errMsg && (
                   <Alert status="error" textAlign="center">
                     {errMsg}
