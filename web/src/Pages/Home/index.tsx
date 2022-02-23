@@ -50,11 +50,11 @@ function HomePage() {
           <Text fontSize={["xl", null, "3xl"]} fontWeight="bold" pb={2}>
             Welcome!
           </Text>
-          <Text fontSize={["md", null, "xl"]} textAlign="center">
+          <Text fontSize={{ base: "md", lg: "xl" }} textAlign="center">
             Start a new transfer or check your active transfers.
           </Text>
           <Button
-            fontSize={["md", null, "xl"]}
+            fontSize={{ base: "md", lg: "xl" }}
             colorScheme="teal"
             rounded={15}
             p={6}

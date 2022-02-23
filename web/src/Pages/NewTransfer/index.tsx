@@ -96,13 +96,13 @@ function NewTransfer() {
                   name="phrase"
                   label="Enter the phrase you will use to access your file(s)"
                   placeholder="Transfer phrase"
-                  fontSize={["md", null, "xl"]}
+                  fontSize={{ base: "md", lg: "xl" }}
                   validate={validatePhrase}
                   labelPos="center"
                 />
                 <InputField
                   name="duration"
-                  fontSize={["md", null, "xl"]}
+                  fontSize={{ base: "md", lg: "xl" }}
                   inputType="radio"
                   label="For how long will it be available?"
                   labelPos="center"
@@ -111,7 +111,7 @@ function NewTransfer() {
                 <Box>
                   <InputField
                     name="is_public"
-                    fontSize={["md", null, "xl"]}
+                    fontSize={{ base: "md", lg: "xl" }}
                     inputType="check-box"
                     label="This transfer is not for myself."
                   />

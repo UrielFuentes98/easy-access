@@ -106,7 +106,7 @@ function SignUp() {
                   name="question_private"
                   label="Private question"
                   placeholder="Select a question"
-                  fontSize={["md", null, "xl"]}
+                  fontSize={{ base: "md", lg: "xl" }}
                   inputType="select"
                   selectOptions={secretQuestions}
                   validate={validatePrivQuestion}
@@ -115,14 +115,14 @@ function SignUp() {
                   name="answer_private"
                   placeholder="Your answer"
                   label="Private answer"
-                  fontSize={["md", null, "xl"]}
+                  fontSize={{ base: "md", lg: "xl" }}
                   validate={validatePrivAnswer}
                 />
                 <InputField
                   name="question_public"
                   label="Public question"
                   placeholder="Select a question"
-                  fontSize={["md", null, "xl"]}
+                  fontSize={{ base: "md", lg: "xl" }}
                   inputType="select"
                   selectOptions={secretQuestions}
                 />
@@ -130,7 +130,7 @@ function SignUp() {
                   name="answer_public"
                   placeholder="Your answer"
                   label="Public answer"
-                  fontSize={["md", null, "xl"]}
+                  fontSize={{ base: "md", lg: "xl" }}
                 />
                 {(submitErr || questionsErrMsg) && (
                   <Alert status="error" textAlign="center">

@@ -82,13 +82,13 @@ function SignIn() {
               <Text fontSize={["xl", null, "3xl"]} fontWeight="bold" pb={2}>
                 Sign In
               </Text>
-              <Text fontSize={["md", null, "xl"]} textAlign="center">
+              <Text fontSize={{ base: "md", lg: "xl" }} textAlign="center">
                 Or SignIn/SignUp to create a new transfer.
               </Text>
               <InputField
                 name="email"
                 placeholder="Enter your email"
-                fontSize={["md", null, "xl"]}
+                fontSize={{ base: "md", lg: "xl" }}
                 validate={validateEmail}
               />
               {submitErr && (

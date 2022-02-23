@@ -21,11 +21,14 @@ export interface selectOption {
   key: number;
   value: string;
 }
+interface FontSize {
+  [index: string]: string;
+}
 
 type InputFieldProps = InputHTMLAttributes<HTMLInputElement> & {
   label?: string;
   name: string;
-  fontSize?: (string | null)[];
+  fontSize?: FontSize;
   validate?: (value: any) => string | undefined;
   inputType?: "select" | "radio" | "check-box" | "file-upload";
   labelPos?: "left" | "center";
@@ -43,7 +46,7 @@ export const InputField: React.FC<InputFieldProps> = ({
   durationOptions,
   ...props
 }) => {
-  const [field, { error, touched }, { setValue }] = useField(props);
+  const [field, { error, touched }] = useField(props);
   return (
     <FormControl isInvalid={!!error && touched}>
       {label && inputType !== "check-box" && (

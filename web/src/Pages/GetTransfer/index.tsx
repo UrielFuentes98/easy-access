@@ -55,7 +55,7 @@ function GetTransfer() {
           alignItems="center"
           key={key}
         >
-          <Text fontSize={["md", null, "xl"]}>{fileName}</Text>
+          <Text fontSize={{ base: "md", lg: "xl" }}>{fileName}</Text>
           <Link href={getDownloadUrl(fileName)}>
             <DownloadIcon
               color="blue.600"

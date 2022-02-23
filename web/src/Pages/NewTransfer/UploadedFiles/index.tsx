@@ -17,7 +17,7 @@ function UploadedFiles({ files, setFiles }: Props) {
           width={[100, null, 130]}
           justifyContent="space-between"
         >
-          <Text fontSize={["md", null, "xl"]}>{file.name}</Text>
+          <Text fontSize={{ base: "md", lg: "xl" }}>{file.name}</Text>
           <CloseIcon
             color="red.600"
             boxSize={3}

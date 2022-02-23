@@ -66,13 +66,13 @@ function PhraseInput() {
               <Text fontSize={["xl", null, "3xl"]} fontWeight="bold" pb={2}>
                 Access Files
               </Text>
-              <Text fontSize={["md", null, "xl"]} textAlign="center">
+              <Text fontSize={{ base: "md", lg: "xl" }} textAlign="center">
                 Enter the phrase to access your files.
               </Text>
               <InputField
                 name="phrase"
                 placeholder="Enter phrase"
-                fontSize={["md", null, "xl"]}
+                fontSize={{ base: "md", lg: "xl" }}
                 validate={validatePhrase}
               />
               {errMsg && (

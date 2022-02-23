@@ -65,13 +65,13 @@ function Question() {
               <Text fontSize={["xl", null, "3xl"]} fontWeight="bold" pb={2}>
                 Secret Question
               </Text>
-              <Text fontSize={["md", null, "xl"]} textAlign="center">
+              <Text fontSize={{ base: "md", lg: "xl" }} textAlign="center">
                 {question}
               </Text>
               <InputField
                 name="answer"
                 placeholder="Enter your answer"
-                fontSize={["md", null, "xl"]}
+                fontSize={{ base: "md", lg: "xl" }}
                 validate={validateAnswer}
               />
               {errMsg && (
