@@ -71,14 +71,18 @@ router.post("/file", upload.single("File"), async (req, res) => {
 router.post("/de-activate", async (req, res) => {
   if (req.isAuthenticated()) {
     const transferPhrase = req.query.phrase as string;
-    const response: responseBody = await deActivateTransfer(
-      req.user,
-      transferPhrase
-    );
-    if (response.key == POST_DEACTIVATE.SUCCESS) {
-      res.status(StatusCodes.OK).json(response);
+    if (transferPhrase) {
+      const response: responseBody = await deActivateTransfer(
+        req.user,
+        transferPhrase
+      );
+      if (response.key == POST_DEACTIVATE.SUCCESS) {
+        res.status(StatusCodes.OK).json(response);
+      } else {
+        res.status(StatusCodes.BAD_REQUEST).json(response);
+      }
     } else {
-      res.status(StatusCodes.BAD_REQUEST).json(response);
+      res.status(StatusCodes.BAD_REQUEST).json(BAD_REQ_RES);
     }
   } else {
     const responseObj: responseBody = {
@@ -92,24 +96,28 @@ router.post("/de-activate", async (req, res) => {
 router.get("/files-names", async (req, res) => {
   const transferId = parseInt(req.query.transId as string);
   const accessCode = req.query.accessId as string;
-  const validAccess = await validateTransferAccess(transferId, accessCode);
-  if (validAccess) {
-    DI.logger.debug(`Valid access to transfer: ${transferId}`);
-    const response = await getTransferFilesNames(transferId);
-    if (response.key == GET_FILES_NAMES.SUCCESS) {
-      DI.logger.debug(
-        `${response.filesNames?.length} files found for transfer: ${transferId}`
-      );
-      res.status(StatusCodes.OK).json(response);
+  if (transferId && accessCode) {
+    const validAccess = await validateTransferAccess(transferId, accessCode);
+    if (validAccess) {
+      DI.logger.debug(`Valid access to transfer: ${transferId}`);
+      const response = await getTransferFilesNames(transferId);
+      if (response.key == GET_FILES_NAMES.SUCCESS) {
+        DI.logger.debug(
+          `${response.filesNames?.length} files found for transfer: ${transferId}`
+        );
+        res.status(StatusCodes.OK).json(response);
+      } else {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(response);
+      }
     } else {
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(response);
+      const response: responseBody = {
+        key: GET_FILES_NAMES.ACCESS_ERROR,
+        message: RES_MESSAGES[GET_FILES_NAMES.ACCESS_ERROR],
+      };
+      res.status(StatusCodes.BAD_REQUEST).json(response);
     }
   } else {
-    const response: responseBody = {
-      key: GET_FILES_NAMES.ACCESS_ERROR,
-      message: RES_MESSAGES[GET_FILES_NAMES.ACCESS_ERROR],
-    };
-    res.status(StatusCodes.BAD_REQUEST).json(response);
+    res.status(StatusCodes.BAD_REQUEST).json(BAD_REQ_RES);
   }
 });
 
@@ -117,34 +125,42 @@ router.get("/file", async (req, res) => {
   const transferId = parseInt(req.query.transId as string);
   const accessCode = req.query.accessId as string;
   const fileName = req.query.fileName as string;
-  const validAccess = await validateTransferAccess(transferId, accessCode);
-
-  if (validAccess) {
-    const response = await getTransferFile(transferId, fileName);
-    if (response.key == GET_FILE.SUCCESS) {
-      const newFilePath = changeFilePath(response.tempFileName!);
-      res.status(StatusCodes.OK).download(newFilePath, (err) => {
-        if (err) DI.logger.error(`Error while sending response file.\n${err}`);
-        else {
-          fs.unlinkSync(newFilePath);
-        }
-      });
+  if (transferId && accessCode && fileName) {
+    const validAccess = await validateTransferAccess(transferId, accessCode);
+    if (validAccess) {
+      const response = await getTransferFile(transferId, fileName);
+      if (response.key == GET_FILE.SUCCESS) {
+        const newFilePath = changeFilePath(response.tempFileName!);
+        res.status(StatusCodes.OK).download(newFilePath, (err) => {
+          if (err)
+            DI.logger.error(`Error while sending response file.\n${err}`);
+          else {
+            fs.unlinkSync(newFilePath);
+          }
+        });
+      } else {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(response);
+      }
     } else {
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(response);
+      const response: responseBody = {
+        key: GET_FILE.ACCESS_ERROR,
+        message: RES_MESSAGES[GET_FILE.ACCESS_ERROR],
+      };
+      res.status(StatusCodes.BAD_REQUEST).json(response);
     }
   } else {
-    const response: responseBody = {
-      key: GET_FILE.ACCESS_ERROR,
-      message: RES_MESSAGES[GET_FILE.ACCESS_ERROR],
-    };
-    res.status(StatusCodes.BAD_REQUEST).json(response);
+    res.status(StatusCodes.BAD_REQUEST).json(BAD_REQ_RES);
   }
 });
 
 router.get("/question", async (req, res) => {
   const queryPhrase = req.query.phrase as string;
-  const response = await getQuestionFromPhrase(queryPhrase);
-  res.status(StatusCodes.OK).json(response);
+  if (queryPhrase) {
+    const response = await getQuestionFromPhrase(queryPhrase);
+    res.status(StatusCodes.OK).json(response);
+  } else {
+    res.status(StatusCodes.BAD_REQUEST).json(BAD_REQ_RES);
+  }
 });
 
 router.get("/validate-answer", async (req, res) => {
