@@ -23,7 +23,7 @@ import {
   getTransferFilesNames,
   validateQuestionAnswer,
   validateTransferAccess,
-  deActivateTranfer,
+  deActivateTransfer,
 } from "../controllers/transfer";
 import { changeFilePath } from "../controllers/utils";
 import { DI } from "../";
@@ -71,7 +71,7 @@ router.post("/file", upload.single("File"), async (req, res) => {
 router.post("/de-activate", async (req, res) => {
   if (req.isAuthenticated()) {
     const transferPhrase = req.query.phrase as string;
-    const response: responseBody = await deActivateTranfer(
+    const response: responseBody = await deActivateTransfer(
       req.user,
       transferPhrase
     );

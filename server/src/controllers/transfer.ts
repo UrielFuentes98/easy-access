@@ -29,6 +29,11 @@ import {
 } from "../utils/interfaces";
 import { Readable } from "stream";
 import { saveFileLocally } from "./utils";
+import {
+  getReaminingSecs,
+  existsActiveTransfer,
+  filterActiveTranfers,
+} from "../utils/transfer";
 
 export interface NewTransfer {
   phrase: string;
@@ -57,13 +62,7 @@ export async function getActiveTranfers(
   return transfersData;
 }
 
-export function getReaminingSecs(transfer: Transfer): number {
-  const diffTime = Math.abs(Date.now() - transfer.createdAt.getTime());
-  const diffSeconds = Math.ceil(diffTime / 1000);
-  return transfer.duration * 60 - diffSeconds;
-}
-
-export async function deActivateTranfer(
+export async function deActivateTransfer(
   reqUser: Express.User,
   transferPhrase: string
 ) {
@@ -91,6 +90,26 @@ export async function deActivateTranfer(
     key: POST_DEACTIVATE.ERROR,
     message: RES_MESSAGES[POST_DEACTIVATE.ERROR],
   } as responseBody;
+}
+
+async function deleteTransfer(tranId: number) {
+  try {
+    const filesToDelte = await DI.fileRepository.find({
+      file_transfer: tranId,
+    });
+    filesToDelte.forEach((file) =>
+      DI.logger.debug(`File deleted. Id: ${file.id}`)
+    );
+    await DI.transferRepository.removeAndFlush(filesToDelte);
+
+    const transferToDelete = await DI.transferRepository.findOne({
+      id: tranId,
+    });
+    await DI.transferRepository.removeAndFlush(transferToDelete!);
+    DI.logger.debug(`Transfer deleted. Id: ${transferToDelete!.id}`);
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 export async function saveNewTransfer(
@@ -137,23 +156,7 @@ export async function saveNewTransfer(
   }
 }
 
-export function existsActiveTransfer(transfersToCheck: Transfer[]): boolean {
-  const activeTransfers = filterActiveTranfers(transfersToCheck);
-  return activeTransfers.length > 0;
-}
-
-function filterActiveTranfers(transfersToCheck: Transfer[]): Transfer[] {
-  const activeTransfers = transfersToCheck.filter((transfer) => {
-    let minimumStartDate = new Date();
-    minimumStartDate.setMinutes(
-      minimumStartDate.getMinutes() - transfer.duration
-    );
-    return transfer.createdAt >= minimumStartDate;
-  });
-  return activeTransfers;
-}
-
-export async function saveTransferFiles(
+export async function saveTransferFile(
   file: Express.Multer.File,
   tranId: string
 ): Promise<responseBody> {
@@ -215,26 +218,6 @@ async function saveFileToS3(
   return true;
 }
 
-async function deleteTransfer(tranId: number) {
-  try {
-    const filesToDelte = await DI.fileRepository.find({
-      file_transfer: tranId,
-    });
-    filesToDelte.forEach((file) =>
-      DI.logger.debug(`File deleted. Id: ${file.id}`)
-    );
-    await DI.transferRepository.removeAndFlush(filesToDelte);
-
-    const transferToDelete = await DI.transferRepository.findOne({
-      id: tranId,
-    });
-    await DI.transferRepository.removeAndFlush(transferToDelete!);
-    DI.logger.debug(`Transfer deleted. Id: ${transferToDelete!.id}`);
-  } catch (err) {
-    console.log(err);
-  }
-}
-
 export async function validateTransferAccess(
   transId: number,
   accessCode: string
@@ -245,6 +228,7 @@ export async function validateTransferAccess(
   });
   return transferMatched ? true : false;
 }
+
 export async function getTransferFilesNames(
   transId: number
 ): Promise<GetFilesNamesRes> {

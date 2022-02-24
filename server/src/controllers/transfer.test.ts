@@ -1,6 +1,6 @@
 import assert from "assert";
+import { getReaminingSecs, existsActiveTransfer } from "../utils/transfer";
 import { Transfer } from "../entities";
-import { existsActiveTransfer, getReaminingSecs } from "./transfer";
 
 describe("Transfer controller", function () {
   describe("Active transfers time tests", function () {
