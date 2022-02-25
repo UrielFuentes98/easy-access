@@ -143,14 +143,15 @@ function NewTransfer() {
                     {errMsg}
                   </Alert>
                 )}
-                <CancelLink />
                 <Button
                   type="submit"
                   colorScheme="teal"
                   isLoading={isSubmitting}
+                  size="lg"
                 >
                   Submit
                 </Button>
+                <CancelLink />
               </VStack>
             </Form>
           )}

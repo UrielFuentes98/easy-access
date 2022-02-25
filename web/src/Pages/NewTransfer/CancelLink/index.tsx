@@ -21,8 +21,8 @@ function CancelLink() {
           <PopoverTrigger>
             <Link
               textDecoration="underline"
-              color="red.500"
-              fontSize={{ base: "md", lg: "xl" }}
+              color="red.400"
+              fontSize={{ base: "sm", lg: "md" }}
             >
               Cancel
             </Link>
