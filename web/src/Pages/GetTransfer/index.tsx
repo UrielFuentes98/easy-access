@@ -68,7 +68,7 @@ function GetTransfer() {
           Transfer
         </Text>
         <Link to={SITE_PATHS.LANDING} style={{ marginLeft: "auto" }}>
-          <CloseIcon color="red.600" boxSize={{ base: 3, lg: 5 }} />
+          <CloseIcon color="red.600" boxSize={{ base: 3, lg: 4 }} />
         </Link>
       </Box>
       {filesNames.map((fileName, key) => (

@@ -14,6 +14,7 @@ import { SITE_PATHS } from "app/routes";
 import { setNewTransferPhrase, setRecentTransfer } from "./newTransferSlice";
 import { useAppDispatch } from "app/hooks";
 import UploadedFiles from "./UploadedFiles";
+import CancelLink from "./CancelLink";
 
 export interface NewTransferForm {
   phrase: string;
@@ -86,7 +87,7 @@ function NewTransfer() {
             }
           }}
         >
-          {({ isSubmitting, setFieldValue, values }) => (
+          {({ isSubmitting }) => (
             <Form>
               <VStack flexFlow="column" alignItems="center" spacing={5}>
                 <Text fontSize={["xl", null, "3xl"]} fontWeight="bold" pb={2}>
@@ -142,7 +143,12 @@ function NewTransfer() {
                     {errMsg}
                   </Alert>
                 )}
-                <Button type="submit" isLoading={isSubmitting}>
+                <CancelLink />
+                <Button
+                  type="submit"
+                  colorScheme="teal"
+                  isLoading={isSubmitting}
+                >
                   Submit
                 </Button>
               </VStack>
