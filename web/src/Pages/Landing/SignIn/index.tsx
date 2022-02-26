@@ -10,7 +10,7 @@ import {
   MSG_REQ_ERR,
   RES_USER_MAGIC_LOGGED_IN,
   RES_USER_MAGIC_SIGNED_UP,
-} from "app_constants";
+} from "app/constants";
 import { SITE_PATHS } from "app/routes";
 
 interface SignInFormVals {

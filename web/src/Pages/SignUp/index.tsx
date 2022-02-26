@@ -10,7 +10,7 @@ import {
   ResponseBody,
   QuestionsResBody,
 } from "app/utils/api";
-import { MSG_QUES_REQ_ERR, MSG_REQ_ERR } from "app_constants";
+import { MSG_QUES_REQ_ERR, MSG_REQ_ERR } from "app/constants";
 import { selectOption } from "features/InputField";
 import { SITE_PATHS } from "app/routes";
 
