@@ -8,8 +8,8 @@ import { InputField } from "features";
 import { loginUser } from "app/utils/api/user";
 import {
   MSG_REQ_ERR,
-  RES_USER_LOGGED_IN,
-  RES_USER_SIGNED_UP,
+  RES_USER_MAGIC_LOGGED_IN,
+  RES_USER_MAGIC_SIGNED_UP,
 } from "app_constants";
 import { SITE_PATHS } from "app/routes";
 
@@ -35,6 +35,7 @@ const magic = new Magic("pk_live_9CECDC3B1BA34ADB");
 function SignIn() {
   const history = useHistory();
   const [submitErr, setSubmitErr] = useState(false);
+  const [initialCheckOn, setInitialCheckOn] = useState(true);
 
   useEffect(() => {
     async function checkLoginStatus() {
@@ -42,12 +43,13 @@ function SignIn() {
       if (isLoggedIn) {
         const didToken = await magic.user.getIdToken();
         const message = await loginUser(didToken);
-        if (message === RES_USER_LOGGED_IN) {
+        if (message === RES_USER_MAGIC_LOGGED_IN) {
           history.push(SITE_PATHS.HOME);
-        } else if (message === RES_USER_SIGNED_UP) {
+        } else if (message === RES_USER_MAGIC_SIGNED_UP) {
           history.push(SITE_PATHS.SIGN_UP);
         }
       }
+      setInitialCheckOn(false);
     }
     checkLoginStatus();
   }, []);
@@ -66,9 +68,9 @@ function SignIn() {
           const email = values.email;
           const didToken = await magic.auth.loginWithMagicLink({ email });
           const message = await loginUser(didToken);
-          if (message === RES_USER_LOGGED_IN) {
+          if (message === RES_USER_MAGIC_LOGGED_IN) {
             history.push(SITE_PATHS.HOME);
-          } else if (message === RES_USER_SIGNED_UP) {
+          } else if (message === RES_USER_MAGIC_SIGNED_UP) {
             history.push(SITE_PATHS.SIGN_UP);
           } else {
             setSubmitErr(true);
@@ -96,7 +98,7 @@ function SignIn() {
                   {MSG_REQ_ERR}
                 </Alert>
               )}
-              <Button type="submit" isLoading={isSubmitting}>
+              <Button type="submit" isLoading={isSubmitting || initialCheckOn}>
                 Submit
               </Button>
             </VStack>
