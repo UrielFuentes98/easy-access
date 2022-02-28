@@ -57,8 +57,8 @@ function TableStats({ transfersStats, setTransfersStats }: Props) {
         </Tr>
       </Thead>
       <Tbody>
-        {transfersStats.map((transfer) => (
-          <Tr>
+        {transfersStats.map((transfer, index) => (
+          <Tr key={index}>
             <Td px={0}>{transfer.phrase}</Td>
             <Td>{getTimeFormat(transfer.secs_remaining)}</Td>
             <Td textAlign="center">

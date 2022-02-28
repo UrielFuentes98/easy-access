@@ -4,12 +4,13 @@ import express from "express";
 import { MikroORM, RequestContext } from "@mikro-orm/core";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
-import session from "express-session";
+import session from "cookie-session";
 import passport from "passport";
+import cors from "cors";
 import fs from "fs";
 import { S3Client } from "@aws-sdk/client-s3";
 
-import { AppDepenInjec, __prod__ } from "./constants";
+import { AppDepenInjec, PORT, __prod__ } from "./constants";
 import microConfig from "./mikro-orm.config";
 import { appLogger } from "./loaders";
 import { Question, Transfer, User, File } from "./entities";
@@ -35,21 +36,16 @@ let main = async () => {
   app.use(
     session({
       secret: "very secret secret",
-      resave: false,
-      saveUninitialized: true,
-      cookie: {
-        maxAge: 60 * 60 * 1000, // 1 hour
-        sameSite: true,
-      },
     })
   );
+  app.use(cors({ origin: "http://easy.urielf.xyz" }));
   app.use((_req, _res, next) => RequestContext.create(DI.orm.em, next));
   app.use(passport.initialize());
   app.use(passport.session());
   app.use("/user", userRouter);
   app.use("/transfer", transferRouter);
-  app.listen(4000, () => {
-    appLogger.info("server started on localhost:4000");
+  app.listen(PORT, () => {
+    appLogger.info(`server started on localhost:${PORT}`);
   });
 };
 

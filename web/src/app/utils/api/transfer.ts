@@ -1,4 +1,4 @@
-import { API_HOST, __prod__ } from "app/constants";
+import { API_HOST } from "app/constants";
 import { NewTransferForm } from "Pages/NewTransfer";
 import { ResponseBody } from ".";
 

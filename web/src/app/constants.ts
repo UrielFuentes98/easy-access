@@ -7,4 +7,4 @@ export const MSG_QUES_REQ_ERR =
   "There was an error loading the secret questions. Please refresh the page.";
 
 export const __prod__ = process.env.NODE_ENV === "production";
-export const API_HOST = __prod__ ? "api.easyaccess.urielf.xyz" : "";
+export const API_HOST = __prod__ ? "http://api.easy.urielf.xyz" : "";
