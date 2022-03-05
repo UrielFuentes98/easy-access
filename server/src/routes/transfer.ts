@@ -29,10 +29,8 @@ import { changeFilePath } from "../controllers/utils";
 import { DI } from "../";
 
 const router = express.Router();
-const upload = multer({
-  dest: "temp/",
-  limits: { fieldSize: 8 * 1024 * 1024 },
-});
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 router.post("/", async (req, res) => {
   if (req.isAuthenticated()) {

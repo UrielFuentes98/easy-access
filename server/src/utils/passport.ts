@@ -2,14 +2,19 @@ import { DI } from "../index";
 
 /* 1️⃣ Setup Magic Admin SDK */
 import { Magic, MagicUserMetadata } from "@magic-sdk/admin";
-import { MAGIC_SECRET_KEY } from "../constants";
-export const magic = new Magic(MAGIC_SECRET_KEY);
+
+export const magic = new Magic(process.env.MAGIC_SK);
 
 /* 2️⃣ Implement Auth Strategy */
 import passport from "passport";
 import { DoneFunc, MagicUser, Strategy as MagicStrategy } from "passport-magic";
 import { User } from "../entities";
 import { wrap } from "@mikro-orm/core";
+
+import pgSimple from "connect-pg-simple";
+import session from "express-session";
+import { Pool } from "pg";
+import { __prod__ } from "../constants";
 
 const strategy = new MagicStrategy(
   async function (req, magicUser, done) {
@@ -91,3 +96,29 @@ passport.deserializeUser(async (id: string, done) => {
 });
 
 export const passAuth = passport;
+
+const pgSession = pgSimple(session);
+
+const sessionDBaccess = new Pool({
+  user: __prod__ ? process.env.DB_USER : "postgres",
+  password: __prod__ ? process.env.DB_PASS : "postgres",
+  host: "localhost",
+  port: 5432,
+  database: "easy_access",
+});
+
+export const sessionConfig = {
+  store: new pgSession({
+    pool: sessionDBaccess,
+    tableName: "session",
+  }),
+  name: "SID",
+  secret: "secret secret",
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24 * 7,
+    secure: true,
+    sameSite: "none",
+  },
+} as session.SessionOptions;

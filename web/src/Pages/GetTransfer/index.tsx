@@ -19,6 +19,7 @@ import {
   setTranAccessId,
   setTransferId,
 } from "Pages/Landing/PhraseInput/transferAccessSlice";
+import { DOMAIN } from "app/constants";
 
 function GetTransfer() {
   const dispatch = useAppDispatch();
@@ -46,7 +47,7 @@ function GetTransfer() {
   }, []);
 
   function getDownloadUrl(fileName: string) {
-    return `http://localhost:4000/transfer/file?transId=${transferId}&accessId=${accessId}&fileName=${fileName}`;
+    return `${DOMAIN}/transfer/file?transId=${transferId}&accessId=${accessId}&fileName=${fileName}`;
   }
 
   return (

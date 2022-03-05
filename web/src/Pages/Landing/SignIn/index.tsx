@@ -7,6 +7,7 @@ import { Magic } from "magic-sdk";
 import { InputField } from "features";
 import { loginUser } from "app/utils/api/user";
 import {
+  MAIGC_PK,
   MSG_REQ_ERR,
   RES_USER_MAGIC_LOGGED_IN,
   RES_USER_MAGIC_SIGNED_UP,
@@ -30,7 +31,7 @@ function validateEmail(value: string) {
   return error;
 }
 
-const magic = new Magic("pk_live_9CECDC3B1BA34ADB");
+const magic = new Magic(MAIGC_PK);
 
 function SignIn() {
   const history = useHistory();

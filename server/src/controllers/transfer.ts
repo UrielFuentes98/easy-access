@@ -14,10 +14,10 @@ import {
   RES_MESSAGES,
   VAL_ANSWER,
   POST_DEACTIVATE,
+  BUCKET_NAME,
 } from "../constants";
 import { DI } from "../index";
 import { v4 as uuidv4 } from "uuid";
-import fs from "fs";
 import {
   getQuestionRes,
   GetTransferRes,
@@ -201,9 +201,9 @@ async function saveFileToS3(
 ): Promise<boolean> {
   const objectKey = `transfer_${tranId}/${file.originalname}`;
   const params: PutObjectCommandInput = {
-    Bucket: process.env.BUCKET_NAME!,
+    Bucket: BUCKET_NAME,
     Key: objectKey,
-    Body: fs.createReadStream(file.path),
+    Body: file.buffer,
   };
   try {
     const command = new PutObjectCommand(params);
@@ -212,8 +212,6 @@ async function saveFileToS3(
   } catch (err) {
     DI.logger.error("Error occured while trying to upload to S3 bucket", err);
     return false;
-  } finally {
-    fs.unlinkSync(file.path); // Empty temp folder
   }
   return true;
 }
@@ -288,7 +286,7 @@ export async function getTransferFile(
 async function fetchFile(objectKey: string): Promise<GetObjectCommandOutput> {
   DI.logger.debug(`File object key to fetch: ${objectKey}`);
   const params: GetObjectCommandInput = {
-    Bucket: process.env.BUCKET_NAME!,
+    Bucket: BUCKET_NAME,
     Key: objectKey,
   };
   const command = new GetObjectCommand(params);

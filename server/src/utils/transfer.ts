@@ -1,4 +1,4 @@
-import { Transfer } from "src/entities";
+import { Transfer } from "../entities";
 
 export function getReaminingSecs(transfer: Transfer): number {
   const diffTime = Math.abs(Date.now() - transfer.createdAt.getTime());

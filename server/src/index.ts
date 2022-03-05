@@ -4,18 +4,19 @@ import express from "express";
 import { MikroORM, RequestContext } from "@mikro-orm/core";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
-import session from "cookie-session";
+import session from "express-session";
 import passport from "passport";
-import cors from "cors";
 import fs from "fs";
+import https from "https";
 import { S3Client } from "@aws-sdk/client-s3";
 
-import { AppDepenInjec, PORT, __prod__ } from "./constants";
+import { AppDepenInjec, __prod__ } from "./constants";
 import microConfig from "./mikro-orm.config";
 import { appLogger } from "./loaders";
 import { Question, Transfer, User, File } from "./entities";
 import { transferRouter, userRouter } from "./routes";
 import path from "path";
+import { credentials, sessionConfig } from "./utils";
 
 export const DI = {} as AppDepenInjec;
 
@@ -33,24 +34,29 @@ let main = async () => {
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
   app.use(cookieParser());
-  app.use(
-    session({
-      secret: "very secret secret",
-    })
-  );
-  app.use(cors({ origin: "http://easy.urielf.xyz" }));
+  app.use(session(sessionConfig));
   app.use((_req, _res, next) => RequestContext.create(DI.orm.em, next));
   app.use(passport.initialize());
   app.use(passport.session());
+  app.use(express.static("public"));
   app.use("/user", userRouter);
   app.use("/transfer", transferRouter);
-  app.listen(PORT, () => {
-    appLogger.info(`server started on localhost:${PORT}`);
-  });
+
+  if (__prod__) {
+    const httpsServer = https.createServer(credentials, app);
+    httpsServer.listen(443, () => {
+      appLogger.info("HTTPS Server running on port 443");
+    });
+  } else {
+    app.listen(4000, () => {
+      appLogger.info("server started on localhost:4000");
+    });
+  }
 };
 
 async function loadDependencyInjector() {
   const s3Client = new S3Client({
+    region: "us-east-2",
     credentials: {
       accessKeyId: process.env.ACCESS_KEY_ID!,
       secretAccessKey: process.env.SECRET_ACCESS_KEY!,

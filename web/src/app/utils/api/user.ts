@@ -1,12 +1,10 @@
-import { API_HOST } from "app/constants";
 import { SignUpFormVals } from "Pages/SignUp";
 
 export async function loginUser(didToken: string | null): Promise<string> {
-  const response = await fetch(`${API_HOST}/user/login`, {
+  const response = await fetch(`user/login`, {
     headers: new Headers({
       Authorization: "Bearer " + didToken,
     }),
-    credentials: "same-origin",
     method: "POST",
   });
   const message = await response.text();
@@ -14,14 +12,14 @@ export async function loginUser(didToken: string | null): Promise<string> {
 }
 
 export async function POST_LogoutUser() {
-  const response = await fetch(`${API_HOST}/user/logout`, {
+  const response = await fetch(`user/logout`, {
     method: "POST",
   });
   return response;
 }
 
 export async function POST_UserInfo(userData: SignUpFormVals) {
-  const response = await fetch(`${API_HOST}/user/register`, {
+  const response = await fetch(`user/register`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -32,6 +30,6 @@ export async function POST_UserInfo(userData: SignUpFormVals) {
 }
 
 export async function GET_SecretQuestions() {
-  const response = await fetch(`${API_HOST}/user/questions`);
+  const response = await fetch(`user/questions`);
   return response;
 }

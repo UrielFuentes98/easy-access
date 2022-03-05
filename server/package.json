@@ -16,6 +16,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/connect-pg-simple": "^7.0.0",
     "@types/cookie-parser": "^1.4.2",
     "@types/cookie-session": "^2.0.44",
     "@types/cors": "^2.8.12",
@@ -40,6 +41,7 @@
     "@mikro-orm/migrations": "^4.5.9",
     "@mikro-orm/postgresql": "^4.5.9",
     "@types/uuid": "^8.3.1",
+    "connect-pg-simple": "^7.0.0",
     "cookie-parser": "^1.4.5",
     "cookie-session": "^2.0.0",
     "cors": "^2.8.5",
@@ -48,6 +50,7 @@
     "express-session": "^1.17.2",
     "fs": "^0.0.1-security",
     "http-status-codes": "^2.1.4",
+    "https": "^1.0.0",
     "morgan": "^1.10.0",
     "multer": "^1.4.3",
     "passport": "^0.5.0",

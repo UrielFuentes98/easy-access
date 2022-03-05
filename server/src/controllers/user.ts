@@ -16,6 +16,7 @@ export async function saveUserInfo(
   user: Express.User
 ): Promise<boolean> {
   try {
+    DI.logger.debug("User issuer", user.issuer);
     const registeredUser = await DI.userRepository.findOne({
       issuer: user.issuer,
     });
