@@ -1,9 +1,11 @@
-import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
-import counterReducer from '../features/counter/counterSlice';
+import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit";
+import transferAccessReducer from "Pages/Landing/PhraseInput/transferAccessSlice";
+import newTransferReducer from "Pages/NewTransfer/newTransferSlice";
 
 export const store = configureStore({
   reducer: {
-    counter: counterReducer,
+    transferAccess: transferAccessReducer,
+    newTransfer: newTransferReducer,
   },
 });
 
