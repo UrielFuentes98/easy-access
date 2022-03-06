@@ -5,7 +5,6 @@ import { Question, Transfer, User, File } from "./entities";
 import { responseBody } from "./utils/interfaces";
 
 export const __prod__ = process.env.NODE_ENV === "production";
-export const PORT = __prod__ ? 80 : 4000;
 export const BUCKET_NAME = __prod__
   ? "easyaccess-prod"
   : "easy-access-transfers";

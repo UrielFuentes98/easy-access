@@ -30,7 +30,7 @@ let main = async () => {
 
   let app = express();
 
-  app.use(logger("dev"));
+  app.use(logger(__prod__ ? "common" : "dev"));
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
   app.use(cookieParser());
