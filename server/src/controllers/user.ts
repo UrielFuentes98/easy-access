@@ -2,7 +2,7 @@ import { wrap } from "@mikro-orm/core";
 import { questionReturnInfo, questionsRes } from "../utils/interfaces";
 import { GET_QUESTIONS, RES_MESSAGES } from "../constants";
 import { Question } from "../entities";
-import { DI } from "../index";
+import { DI } from "../app";
 
 export interface UserInfo {
   answer_public?: string;

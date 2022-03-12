@@ -17,6 +17,7 @@ import { Question, Transfer, User, File } from "./entities";
 import { transferRouter, userRouter } from "./routes";
 import path from "path";
 import { credentials, sessionConfig } from "./utils";
+import cors from "cors";
 
 export const DI = {} as AppDepenInjec;
 
@@ -34,11 +35,11 @@ let main = async () => {
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
   app.use(cookieParser());
+  app.use(cors({ origin: "http://easy.urielf.xyz", credentials: true }));
   app.use(session(sessionConfig));
   app.use((_req, _res, next) => RequestContext.create(DI.orm.em, next));
   app.use(passport.initialize());
   app.use(passport.session());
-  app.use(express.static("public"));
   app.use("/user", userRouter);
   app.use("/transfer", transferRouter);
 

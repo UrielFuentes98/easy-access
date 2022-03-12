@@ -8,7 +8,7 @@ export const MSG_QUES_REQ_ERR =
 
 export const __prod__ = process.env.NODE_ENV === "production";
 export const DOMAIN = __prod__
-  ? "https://easy.urielf.xyz"
+  ? "https://api.easy.urielf.xyz"
   : "http://localhost:4000";
 export const MAIGC_PK = __prod__
   ? "pk_live_F7F693C1F3037A5B"

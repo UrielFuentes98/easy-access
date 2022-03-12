@@ -1,3 +1,4 @@
+import { DOMAIN } from "app/constants";
 import { NewTransferForm } from "Pages/NewTransfer";
 import { ResponseBody } from ".";
 
@@ -14,11 +15,12 @@ export interface TransferResponse extends ResponseBody {
 export async function POST_NewTransfer(newTransFormVals: NewTransferForm) {
   const sendData = getTransferSendData(newTransFormVals);
 
-  const response = await fetch(`transfer`, {
+  const response = await fetch(`${DOMAIN}/transfer`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
     body: JSON.stringify(sendData),
   });
   return response;
@@ -52,28 +54,35 @@ async function POST_SaveFile(file: File, tran_id: number): Promise<boolean> {
   const filesData = new FormData();
   filesData.append("File", file);
   filesData.append("tranId", tran_id.toString());
-  const response = await fetch(`transfer/file`, {
+  const response = await fetch(`${DOMAIN}/transfer/file`, {
     method: "POST",
     body: filesData,
+    credentials: "include",
   });
   return response.ok;
 }
 
 export async function GET_FilesNames(transferId: number, accessId: string) {
   const response = await fetch(
-    `transfer/files-names?transId=${transferId}&accessId=${accessId}`
+    `${DOMAIN}/transfer/files-names?transId=${transferId}&accessId=${accessId}`
   );
   return response;
 }
 
 export async function GET_ActiveTransfers() {
-  const response = await fetch(`transfer/actives`);
+  const response = await fetch(`${DOMAIN}/transfer/actives`, {
+    credentials: "include",
+  });
   return response;
 }
 
 export async function POST_DeactivateTransfer(phrase: string) {
-  const response = await fetch(`transfer/de-activate?phrase=${phrase}`, {
-    method: "POST",
-  });
+  const response = await fetch(
+    `${DOMAIN}/transfer/de-activate?phrase=${phrase}`,
+    {
+      method: "POST",
+      credentials: "include",
+    }
+  );
   return response;
 }

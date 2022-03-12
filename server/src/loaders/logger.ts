@@ -16,7 +16,7 @@ if (__prod__) {
 }
 
 const LoggerInstance = winston.createLogger({
-  level: __prod__ ? "info" : "debug",
+  level: __prod__ ? "debug" : "debug",
   transports,
 });
 

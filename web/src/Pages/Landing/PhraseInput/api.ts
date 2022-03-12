@@ -1,7 +1,8 @@
+import { DOMAIN } from "app/constants";
 import { ResponseBody } from "app/utils/api";
 
 export async function GET_TransferQuestion(phrase: string) {
-  const response = await fetch(`transfer/question?phrase=${phrase}`);
+  const response = await fetch(`${DOMAIN}/transfer/question?phrase=${phrase}`);
   return await response.json();
 }
 

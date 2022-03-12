@@ -1,4 +1,4 @@
-import { DI } from "../index";
+import { DI } from "../app";
 
 /* 1️⃣ Setup Magic Admin SDK */
 import { Magic, MagicUserMetadata } from "@magic-sdk/admin";

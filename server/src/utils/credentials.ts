@@ -4,15 +4,15 @@ import { __prod__ } from "../constants";
 let credentials = {};
 if (__prod__) {
   const privateKey = fs.readFileSync(
-    "/etc/letsencrypt/live/easy.urielf.xyz/privkey.pem",
+    "/etc/letsencrypt/live/api.easy.urielf.xyz/privkey.pem",
     "utf8"
   );
   const certificate = fs.readFileSync(
-    "/etc/letsencrypt/live/easy.urielf.xyz/cert.pem",
+    "/etc/letsencrypt/live/api.easy.urielf.xyz/cert.pem",
     "utf8"
   );
   const ca = fs.readFileSync(
-    "/etc/letsencrypt/live/easy.urielf.xyz/chain.pem",
+    "/etc/letsencrypt/live/api.easy.urielf.xyz/chain.pem",
     "utf8"
   );
 

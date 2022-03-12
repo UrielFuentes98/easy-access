@@ -16,7 +16,7 @@ import {
   POST_DEACTIVATE,
   BUCKET_NAME,
 } from "../constants";
-import { DI } from "../index";
+import { DI } from "../app";
 import { v4 as uuidv4 } from "uuid";
 import {
   getQuestionRes,

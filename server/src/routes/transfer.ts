@@ -26,7 +26,7 @@ import {
   deActivateTransfer,
 } from "../controllers/transfer";
 import { changeFilePath } from "../controllers/utils";
-import { DI } from "../";
+import { DI } from "../app";
 
 const router = express.Router();
 const storage = multer.memoryStorage();

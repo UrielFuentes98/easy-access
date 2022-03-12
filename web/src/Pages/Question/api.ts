@@ -1,8 +1,9 @@
+import { DOMAIN } from "app/constants";
 import { ResponseBody } from "app/utils/api";
 
 export async function GET_ValdiateAnswer(tranId: number, answer: string) {
   const response = await fetch(
-    `/transfer/validate-answer?transferId=${tranId.toString()}&answer=${answer}`
+    `${DOMAIN}/transfer/validate-answer?transferId=${tranId.toString()}&answer=${answer}`
   );
   return await response.json();
 }

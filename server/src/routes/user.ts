@@ -8,7 +8,7 @@ import {
 import { StatusCodes } from "http-status-codes";
 import { saveUserInfo, getQuestions } from "../controllers";
 import { passport, magic } from "../utils";
-import { DI } from "../";
+import { DI } from "../app";
 const router = express.Router();
 
 /* Attach middleware to login endpoint */
